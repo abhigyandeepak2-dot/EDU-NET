@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doubt Review Queue</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            color: white;
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 28px;
+        }
+        .queue-stats {
+            display: flex;
+            gap: 20px;
+        }
+        .stat-item {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+        .controls {
+            padding: 30px 40px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .filter-select, .search-box input {
+            padding: 12px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+        }
+        .search-box {
+            position: relative;
+        }
+        .search-box input {
+            padding-left: 45px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        .filter-btn {
+            padding: 12px 24px;
+            border: 2px solid #e1e5e9;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .content {
+            padding: 40px;
+        }
+        .doubts-list {
+            display: grid;
+            gap: 25px;
+        }
+        .doubt-card {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .doubt-card:hover {
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        }
+        .doubt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .doubt-info {
+            flex: 1;
+        }
+        .doubt-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .doubt-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .priority-high { background: #ff4757; color: white; }
+        .priority-medium { background: #ffa502; color: white; }
+        .priority-low { background: #2ed573; color: white; }
+        .question-text {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        .btn-approve { background: #00b894; color: white; }
+        .btn-reject { background: #ff4757; color: white; }
+        .btn-ai { background: #667eea; color: white; }
+        .btn-view { background: #74b9ff; color: white; }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .ai-assist {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+        }
+        .ai-assist.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .ai-response {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+        .no-doubts {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .doubt-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Doubt Review Queue</h1>
+            <div class="queue-stats">
+                <div class="stat-item">24 Pending</div>
+                <div class="stat-item">12 High Priority</div>
+                <div class="stat-item">Avg Wait: 3.2h</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="filter-group">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search by title, student, or subject...">
+                </div>
+                <select class="filter-select" id="subjectFilter">
+                    <option value="">All Subjects</option>
+                    <option value="DSTL">DSTL</option>
+                    <option value="COA">COA</option>
+                    <option value="DS">DS</option>
+                    <option value="UHVP">UHVP</option>
+                </select>
+                <select class="filter-select" id="priorityFilter">
+                    <option value="">All Priorities</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+                <select class="filter-select" id="dateFilter">
+                    <option value="">All Dates</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                </select>
+            </div>
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="pending">Pending</button>
+            <button class="filter-btn" data-filter="high">High Priority</button>
+        </div>
+
+        <div class="content">
+            <div class="doubts-list" id="doubtsList">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample doubts data
+        const doubts = [
+            {
+                id: 1,
+                title: "Quantum superposition - real experiment confusion",
+                student: "Abhigaya.",
+                subject: "UHVP",
+                priority: "high",
+                date: "2025-12-21 10:30",
+                question: "How does quantum superposition work in actual experiments? Textbook explanation doesn't match online videos.",
+                attachments: 2
+            },
+            {
+                id: 2,
+                title: "Binary search tree insertion bug",
+                student: "Deepanshi garg.",
+                subject: "COA",
+                priority: "medium",
+                date: "2025-12-21 09:15",
+                question: "My BST insertion gives wrong output for unbalanced trees. Code works for balanced but fails randomly.",
+                attachments: 1
+            },
+            {
+                id: 3,
+                title: "Integration by parts - LIATE rule application",
+                student: "Aakarsh.",
+                subject: "DSTL",
+                priority: "high",
+                date: "2025-12-21 08:45",
+                question: "When applying LIATE rule, sometimes I get correct answer but integration becomes more complex. What's the logic?",
+                attachments: 0
+            },
+            {
+                id: 4,
+                title: "React hooks useEffect dependency array",
+                student: "Ansh Kumar.",
+                subject: "DS",
+                priority: "low",
+                date: "2025-12-20 16:20",
+                question: "useEffect runs twice in development. How to properly manage dependency array for API calls?",
+                attachments: 1
+            }
+        ];
+
+        let filteredDoubts = [...doubts];
+
+        function renderDoubts(doubtsList) {
+            const container = document.getElementById('doubtsList');
+            
+            if (doubtsList.length === 0) {
+                container.innerHTML = `
+                    <div class="no-doubts">
+                        <div style="font-size: 64px; margin-bottom: 20px;">📭</div>
+                        <h3>No doubts match your filters</h3>
+                        <p>Try adjusting your search criteria</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = doubtsList.map(doubt => `
+                <div class="doubt-card" data-id="${doubt.id}" data-subject="${doubt.subject.toLowerCase()}" data-priority="${doubt.priority}">
+                    <div class="doubt-header">
+                        <div class="doubt-info">
+                            <div class="doubt-title">${doubt.title}</div>
+                            <div class="doubt-meta">
+                                <span>👤 ${doubt.student}</span>
+                                <span>📚 ${doubt.subject}</span>
+                                <span>📅 ${doubt.date}</span>
+                                <span class="priority-badge priority-${doubt.priority}">P${doubt.priority.charAt(0).toUpperCase()}</span>
+                            </div>
+                            <div class="question-text">${doubt.question}</div>
+                            ${doubt.attachments > 0 ? `<div style="color: #666; font-size: 14px;">📎 ${doubt.attachments} attachment(s)</div>` : ''}
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-view" onclick="viewDetails(${doubt.id})">View</button>
+                            <button class="btn btn-ai" onclick="generateAIAnswer(${doubt.id})">🤖 AI Assist</button>
+                            <button class="btn btn-approve" onclick="approveDoubt(${doubt.id})">✅ Approve</button>
+                            <button class="btn btn-reject" onclick="rejectDoubt(${doubt.id})">❌ Reject</button>
+                        </div>
+                    </div>
+                    <div class="ai-assist" id="ai-${doubt.id}">
+                        <strong>🤖 AI Generated Answer:</strong>
+                        <div class="ai-response" id="ai-response-${doubt.id}">
+                            Click "AI Assist" to generate a draft answer using AI assistance...
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter and search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            filteredDoubts = doubts.filter(doubt => 
+                doubt.title.toLowerCase().includes(query) ||
+                doubt.student.toLowerCase().includes(query) ||
+                doubt.subject.toLowerCase().includes(query) ||
+                doubt.question.toLowerCase().includes(query)
+            );
+            renderDoubts(filteredDoubts);
+        });
+
+        document.getElementById('subjectFilter').addEventListener('change', filterDoubts);
+        document.getElementById('priorityFilter').addEventListener('change', filterDoubts);
+        document.getElementById('dateFilter').addEventListener('change', filterDoubts);
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filterDoubts();
+            });
+        });
+
+        function filterDoubts() {
+            let results = [...doubts];
+            
+            const subjectFilter = document.getElementById('subjectFilter').value;
+            const priorityFilter = document.getElementById('priorityFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            if (subjectFilter) {
+                results = results.filter(d => d.subject === subjectFilter);
+            }
+            
+            if (priorityFilter) {
+                results = results.filter(d => d.priority === priorityFilter);
+            }
+            
+            filteredDoubts = results;
+            renderDoubts(filteredDoubts);
+        }
+
+        // Action handlers
+        function viewDetails(id) {
+            alert(`Opening doubt details for ID: ${id}`);
+            // window.location.href = `/teacher/doubt/${id}`;
+        }
+
+        function approveDoubt(id) {
+            if (confirm('Approve this doubt for answering?')) {
+                const card = document.querySelector(`[data-id="${id}"]`);
+                card.style.borderColor = '#00b894';
+                alert('✅ Doubt approved! Added to your answer queue.');
+            }
+        }
+
+        function rejectDoubt(id) {
+            if (confirm('Reject this doubt? Student will be notified.')) {
+                const card = document.querySelector(`[data-id="${id}"]`);
+                card.style.opacity = '0.5';
+                card.innerHTML += '<div style="color: #ff4757; margin-top: 15px; font-weight: 600;">❌ Rejected</div>';
+            }
+        }
+
+        function generateAIAnswer(id) {
+            const aiSection = document.getElementById(`ai-${id}`);
+            const aiResponse = document.getElementById(`ai-response-${id}`);
+            
+            aiSection.classList.add('active');
+            
+            // Simulate AI generation
+            aiResponse.innerHTML = `
+                <strong>📚 AI Draft Answer:</strong><br><br>
+                Great question! Here's a structured response:<br>
+                1. <strong>Key Concept:</strong> [AI analyzes question]<br>
+                2. <strong>Step-by-Step Solution:</strong><br>
+                   • Step 1: ...<br>
+                   • Step 2: ...<br>
+                3. <strong>Example:</strong> [Generated example]<br>
+                4. <strong>Common Mistakes:</strong> [Identified pitfalls]<br><br>
+                <em>✏️ Edit this draft before posting to students</em>
+            `;
+            
+            aiResponse.style.background = 'rgba(0,184,148,0.1)';
+        }
+
+        // Initial render
+        renderDoubts(doubts);
+    </script>
+</body>
+</html>

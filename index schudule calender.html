@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Spreadsheet View</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial; margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); color: #333; padding: 20px; }
+        .header { background: white; padding: 20px; text-align: center; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-bottom: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #667eea; color: white; font-weight: bold; }
+        tr:hover { background: #f1f1f1; }
+        .no-data { text-align: center; padding: 50px; color: #666; }
+        .controls { text-align: center; margin-bottom: 20px; }
+        button { padding: 10px; margin: 0 5px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-table"></i> Schedule Spreadsheet View</h1>
+        <p>View your schedules in a simple table format.</p>
+    </div>
+    <div class="container">
+        <div class="controls">
+            <button onclick="sortByDate()"><i class="fas fa-sort"></i> Sort by Date</button>
+            <button onclick="filterBySubject()"><i class="fas fa-filter"></i> Filter by Subject</button>
+        </div>
+        <table id="schedule-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Subject</th>
+                    <th>Time</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="schedule-body">
+                <!-- Schedules will be listed here -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+
+        function displaySchedules(data = schedules) {
+            const tbody = document.getElementById('schedule-body');
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="no-data">No schedules found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.map((s, index) => `
+                <tr>
+                    <td>${s.date}</td>
+                    <td>${s.subject}</td>
+                    <td>${s.time}</td>
+                    <td><button onclick="deleteSchedule(${index})"><i class="fas fa-trash"></i> Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function sortByDate() {
+            schedules.sort((a, b) => new Date(a.date) - new Date(b.date));
+            displaySchedules();
+        }
+
+        function filterBySubject() {
+            const subject = prompt('Enter subject to filter:');
+            if (subject) {
+                const filtered = schedules.filter(s => s.subject.toLowerCase().includes(subject.toLowerCase()));
+                displaySchedules(filtered);
+            }
+        }
+
+        function deleteSchedule(index) {
+            if (confirm('Delete this schedule?')) {
+                schedules.splice(index, 1);
+                localStorage.setItem('schedules', JSON.stringify(schedules));
+                displaySchedules();
+            }
+        }
+
+        displaySchedules();
+    </script>
+</body>
+</html>

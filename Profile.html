@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile & Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        .content {
+            padding: 40px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e1e5e9;
+            margin-bottom: 40px;
+        }
+        .tab-btn {
+            padding: 20px 30px;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+        .verification-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .verified { background: #d4edda; color: #155724; }
+        .pending { background: #fff3cd; color: #856404; }
+        .not-verified { background: #f8d7da; color: #721c24; }
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ddd;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .toggle-switch.active {
+            background: #667eea;
+        }
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(30px);
+        }
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .subject-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .subject-item:hover, .subject-item.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        .subject-checkbox {
+            margin-right: 12px;
+            transform: scale(1.2);
+            accent-color: #667eea;
+        }
+        .save-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .save-btn:hover {
+            transform: translateY(-2px);
+        }
+        .save-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        @media (max-width: 768px) {
+            .profile-stats {
+                gap: 20px;
+            }
+            .tabs {
+                flex-direction: column;
+            }
+            .subjects-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👤 Profile & Settings</h1>
+            <p>Manage your account, preferences, and specializations</p>
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-number">45</div>
+                    <div class="stat-label">Doubts Asked</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">32</div>
+                    <div class="stat-label">Answered</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">4.8</div>
+                    <div class="stat-label">Rating</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="profile">Profile</button>
+                <button class="tab-btn" data-tab="notifications">Notifications</button>
+                <button class="tab-btn" data-tab="subjects">Subjects</button>
+                <button class="tab-btn" data-tab="security">Security</button>
+            </div>
+
+            <!-- Profile Tab -->
+            <div class="tab-content active" id="profile">
+                <div class="section">
+                    <h3>👤 Personal Information</h3>
+                    <div class="profile-avatar" onclick="document.getElementById('avatarInput').click()">
+                        AK
+                        <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" value="Aarav Kumar" id="fullName">
+                    </div>
+                    <div class="form-group">
+                        <label>Institutional Email</label>
+                        <input type="email" value="aarav.kumar@college.edu" id="email" readonly>
+                        <div style="margin-top: 8px;">
+                            <span class="verification-status verified">✅ Verified</span>
+                            <button style="margin-left: 10px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">Re-verify</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Student ID</label>
+                        <input type="text" value="STU2025001234">
+                    </div>
+                    <div class="form-group">
+                        <label>Course/Year</label>
+                        <select>
+                            <option>B.Tech Computer Science - 2nd Year</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Tab -->
+            <div class="tab-content" id="notifications">
+                <div class="section">
+                    <h3>🔔 Notification Preferences</h3>
+                    
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+                        <label>Email Notifications</label>
+                        <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div style="padding: 20px; border: 2px solid #e1e5e9; border-radius: 12px;">
+                            <h4 style="margin-bottom: 15px;">When Doubt Gets Answered</h4>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <label>Push Notifications</label>
+                                <div class="toggle-switch" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                                <label>Email Alerts</label>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 20px; border: 2px solid #e1e5e9; border-radius: 12px;">
+                            <h4 style="margin-bottom: 15px;">New Comments on My Doubts</h4>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <label>Push Notifications</label>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                                <label>Email Alerts</label>
+                                <div class="toggle-switch" onclick="toggleSwitch(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subjects Tab -->
+            <div class="tab-content" id="subjects">
+                <div class="section">
+                    <h3>📚 Subject Specializations</h3>
+                    <p style="color: #666; margin-bottom: 25px;">Select subjects you're strong in - help others with these!</p>
+                    <div class="subjects-grid">
+                        <label class="subject-item active">
+                            <input type="checkbox" class="subject-checkbox" checked>
+                            <span>Mathematics</span>
+                        </label>
+                        <label class="subject-item">
+                            <input type="checkbox" class="subject-checkbox">
+                            <span>Physics</span>
+                        </label>
+                        <label class="subject-item">
+                            <input type="checkbox" class="subject-checkbox">
+                            <span>Computer Science</span>
+                        </label>
+                        <label class="subject-item active">
+                            <input type="checkbox" class="subject-checkbox" checked>
+                            <span>Python Programming</span>
+                        </label>
+                        <label class="subject-item">
+                            <input type="checkbox" class="subject-checkbox">
+                            <span>Web Development</span>
+                        </label>
+                        <label class="subject-item">
+                            <input type="checkbox" class="subject-checkbox">
+                            <span>Data Structures</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Tab -->
+            <div class="tab-content" id="security">
+                <div class="section">
+                    <h3>🔒 Account Security</h3>
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" placeholder="Enter current password">
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" placeholder="New password (min 8 chars)">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" placeholder="Confirm new password">
+                    </div>
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <button class="save-btn" style="flex: 1;">Change Password</button>
+                        <button class="save-btn" style="background: #dc3545;">Delete Account</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <button class="save-btn">💾 Save All Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Toggle switches
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+
+        // Subject selection
+        document.querySelectorAll('.subject-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const checkbox = item.querySelector('.subject-checkbox');
+                checkbox.checked = !checkbox.checked;
+                item.classList.toggle('active');
+            });
+        });
+
+        // Avatar upload
+        document.getElementById('avatarInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.querySelector('.profile-avatar').style.backgroundImage = `url(${e.target.result})`;
+                    document.querySelector('.profile-avatar').innerHTML = '';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Form validation and save
+        document.querySelector('.save-btn:last-of-type').addEventListener('click', () => {
+            // Simulate save
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = '✅ Saved Successfully!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

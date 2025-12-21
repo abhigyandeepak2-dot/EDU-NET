@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teacher Chat Moderation</title>
+  <style>
+    *{box-sizing:border-box;font-family:system-ui,sans-serif;}
+    body{
+      margin:0;height:100vh;display:flex;align-items:center;justify-content:center;
+      background:#0f172a;color:#111827;
+    }
+    .chat{
+      width:100%;max-width:720px;height:440px;background:#f9fafb;
+      border-radius:14px;box-shadow:0 14px 32px rgba(15,23,42,.35);
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+    .header{
+      padding:8px 12px;border-bottom:1px solid #e5e7eb;font-size:13px;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    .header span{font-size:11px;color:#6b7280;}
+    .messages{
+      flex:1;padding:8px 10px;overflow-y:auto;font-size:13px;
+      background:#f3f4f6;
+    }
+    .row{
+      margin-bottom:8px;
+    }
+    .meta{
+      font-size:11px;color:#6b7280;margin-bottom:2px;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    .bubble{
+      display:inline-block;max-width:80%;padding:6px 9px;border-radius:8px;
+      background:#ffffff;border:1px solid #e5e7eb;
+    }
+    .student-name{font-weight:600;}
+    .actions{
+      display:flex;gap:4px;font-size:11px;
+    }
+    .btn-link{
+      padding:2px 6px;border-radius:999px;border:none;cursor:pointer;
+      background:#fee2e2;color:#b91c1c;
+    }
+    .btn-small{
+      padding:2px 6px;border-radius:999px;border:none;cursor:pointer;
+      background:#e5e7eb;color:#374151;
+    }
+    .blocked{
+      opacity:.4;
+    }
+
+    /* teacher input (optional) */
+    .composer{
+      border-top:1px solid #e5e7eb;padding:8px 10px;display:flex;gap:6px;
+      background:#ffffff;
+    }
+    #teacherInput{
+      flex:1;padding:6px 8px;border-radius:999px;border:1px solid #d1d5db;
+      font-size:13px;
+    }
+    #teacherInput.warning{
+      border-color:#f97316;background:#fffbeb;
+    }
+    #teacherSend{
+      padding:6px 12px;border-radius:999px;border:none;
+      background:#2563eb;color:#fff;font-size:13px;cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat">
+    <div class="header">
+      <div>Live session · Teacher view</div>
+      <span>Click “Block” to mute a student immediately</span>
+    </div>
+
+    <div class="messages" id="messages">
+      <!-- sample student messages -->
+      <div class="row" data-student="Rahul">
+        <div class="meta">
+          <span><span class="student-name">Rahul</span> · 3:25 PM</span>
+          <div class="actions">
+            <button class="btn-link block-btn">Block</button>
+            <button class="btn-small delete-btn">Delete</button>
+          </div>
+        </div>
+        <div class="bubble">
+          Sir, I have a doubt in quadratic equations.
+        </div>
+      </div>
+
+      <div class="row" data-student="Aman">
+        <div class="meta">
+          <span><span class="student-name">Aman</span> · 3:26 PM</span>
+          <div class="actions">
+            <button class="btn-link block-btn">Block</button>
+            <button class="btn-small delete-btn">Delete</button>
+          </div>
+        </div>
+        <div class="bubble">
+          This question is so hard!
+        </div>
+      </div>
+    </div>
+
+    <!-- optional teacher send box -->
+    <div class="composer">
+      <input id="teacherInput" type="text" placeholder="Reply to class…" />
+      <button id="teacherSend">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const badWords = ["idiot","stupid","hate"]; // demo list
+
+    // Block & delete behaviour
+    const messages = document.getElementById("messages");
+    const blockedStudents = new Set();
+
+    messages.addEventListener("click", e => {
+      const row = e.target.closest(".row");
+      if (!row) return;
+      const name = row.dataset.student;
+
+      // block student
+      if (e.target.classList.contains("block-btn")) {
+        if (blockedStudents.has(name)) {
+          alert(name + " is already blocked.");
+          return;
+        }
+        blockedStudents.add(name);
+        row.classList.add("blocked");
+        alert("Student \"" + name + "\" has been blocked from chat.");
+        // here you would also call backend to mute/ban this student
+      }
+
+      // delete message
+      if (e.target.classList.contains("delete-btn")) {
+        row.remove();
+        // backend: delete this specific message
+      }
+    });
+
+    // Example: teacher input with same profanity check (optional)
+    const teacherInput = document.getElementById("teacherInput");
+    const teacherSend = document.getElementById("teacherSend");
+
+    teacherInput.addEventListener("input", () => {
+      const val = teacherInput.value.toLowerCase();
+      const bad = badWords.some(w => val.includes(w));
+      teacherInput.classList.toggle("warning", bad);
+    });
+
+    teacherSend.addEventListener("click", () => {
+      const text = teacherInput.value.trim();
+      if (!text) return;
+      const bad = badWords.some(w => text.toLowerCase().includes(w));
+      if (bad) {
+        alert("Please avoid abusive words even from teacher side.");
+        return;
+      }
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `
+        <div class="meta"><span class="student-name">You (Teacher)</span> · now</div>
+        <div class="bubble">${text}</div>`;
+      messages.appendChild(row);
+      messages.scrollTop = messages.scrollHeight;
+      teacherInput.value = "";
+      teacherInput.classList.remove("warning");
+    });
+
+    // Example: when new student message comes from backend:
+    // function addStudentMessage(name, text) {
+    //   if (blockedStudents.has(name)) return; // ignored because blocked
+    //   // append row like samples above
+    // }
+  </script>
+</body>
+</html>

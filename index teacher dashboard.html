@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial; margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); color: #333; }
+        .header { background: white; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 1200px; margin: 20px auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        h2 { color: #667eea; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 10px; border-bottom: 1px solid #eee; }
+        form { display: flex; flex-direction: column; }
+        input, button { padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; cursor: pointer; }
+        .notification { background: #fff3cd; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-calendar-check"></i> Dashboard</h1>
+        <p>Welcome! Manage schedules and events.</p>
+    </div>
+    <div class="container">
+        <div class="section">
+            <h2><i class="fas fa-calendar-day"></i> Today's Schedule</h2>
+            <ul id="today-schedule"></ul>
+        </div>
+        <div class="section">
+            <h2><i class="fas fa-plus"></i> Add Schedule</h2>
+            <form id="add-schedule">
+                <input type="text" id="subject" placeholder="Subject" required>
+                <input type="time" id="time" required>
+                <input type="date" id="date" required>
+                <button type="submit">Add</button>
+            </form>
+        </div>
+        <div class="section">
+            <h2><i class="fas fa-bell"></i> Notifications</h2>
+            <div id="notifications">
+                <div class="notification">Reminder: Parent-teacher meeting tomorrow.</div>
+                <div class="notification">New assignment due next week.</div>
+            </div>
+        </div>
+        <div class="section">
+            <h2><i class="fas fa-calendar-alt"></i> Upcoming Events</h2>
+            <ul id="upcoming-events"></ul>
+        </div>
+    </div>
+    <script>
+        let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+        let events = JSON.parse(localStorage.getItem('events')) || [
+            { title: 'College Orientation', date: '2025-12-21' },
+            { title: 'Midterm Exams', date: '2025-12-22' },
+            { title: 'Campus Fest', date: '2025-12-25' }
+        ];
+
+        function displayTodaySchedule() {
+            const today = new Date().toISOString().split('T')[0];
+            const todaySchedules = schedules.filter(s => s.date === today);
+            document.getElementById('today-schedule').innerHTML = todaySchedules.length ? todaySchedules.map(s => `<li>${s.subject} at ${s.time}</li>`).join('') : '<li>No schedules today.</li>';
+        }
+
+        function displayUpcomingEvents() {
+            document.getElementById('upcoming-events').innerHTML = events.map(e => `<li>${e.title} on ${e.date}</li>`).join('');
+        }
+
+        document.getElementById('add-schedule').addEventListener('submit', e => {
+            e.preventDefault();
+            const subject = document.getElementById('subject').value;
+            const time = document.getElementById('time').value;
+            const date = document.getElementById('date').value;
+            schedules.push({ subject, time, date });
+            localStorage.setItem('schedules', JSON.stringify(schedules));
+            displayTodaySchedule();
+            alert('Schedule added!');
+        });
+
+        displayTodaySchedule();
+        displayUpcomingEvents();
+    </script>
+</body>
+</html>

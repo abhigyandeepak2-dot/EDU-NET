@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edu-Net E-Books</title>
+    <style>
+        :root {
+            --primary: #36e0fa;
+            --primary-hover: #1a6485;
+            --primary-light: #e8f4f8;
+            --secondary: #fae386;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --border: #ecf0f1;
+            --bg: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a6485 100%);
+            color: white;
+            padding: 25px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .search-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 30px 0 20px 0;
+            color: var(--text);
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .book-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            text-align: center;
+            padding: 10px;
+            font-weight: 600;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .book-info {
+            padding: 16px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: var(--text);
+            line-height: 1.3;
+            min-height: 35px;
+        }
+
+        .book-author {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .book-rating {
+            font-size: 12px;
+            color: var(--secondary);
+            margin-bottom: 12px;
+        }
+
+        .book-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 10px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-read {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-read:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-download {
+            background-color: var(--border);
+            color: var(--text);
+            border: 2px solid var(--text-light);
+        }
+
+        .btn-download:hover {
+            background-color: var(--text-light);
+            color: white;
+        }
+
+        .btn-bookmark {
+            background-color: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+            font-size: 14px;
+            padding: 8px;
+        }
+
+        .btn-bookmark:hover {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .books-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 16px;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .book-cover {
+                height: 200px;
+            }
+
+            .book-title {
+                font-size: 13px;
+                min-height: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>📚 Edu-Net E-Books Library</h1>
+            <p>Browse and read our complete collection of educational books</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search by title, author, or subject..." id="searchInput">
+                <button class="btn" onclick="searchBooks()">🔍 Search</button>
+            </div>
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterBooks('all')">All Categories</button>
+                <button class="filter-btn" onclick="filterBooks('programming')">💻 Programming</button>
+                <button class="filter-btn" onclick="filterBooks('science')">🧪 Science</button>
+                <button class="filter-btn" onclick="filterBooks('maths')">🔢 Mathematics</button>
+                <button class="filter-btn" onclick="filterBooks('literature')">📖 Literature</button>
+                <button class="filter-btn" onclick="filterBooks('personal')">🧠 Self-Help</button>
+            </div>
+        </div>
+
+        <!-- Books Grid -->
+        <h2 class="section-title">📕 Available Books</h2>
+        <div class="books-grid" id="booksGrid">
+            <!-- Books will be populated here -->
+        </div>
+    </div>
+
+    <script>
+        const books = [
+            {
+                id: 1,
+                title: 'Ultimate Python Programming',
+                author: 'Deepali Srivastava',
+                rating: '4.7★',
+                category: 'programming',
+                cover: 'https://m.media-amazon.com/images/I/71ovXaoKauL._SY385_.jpg'
+            },
+            {
+                id: 2,
+                title: 'Data Structures using C',
+                author: 'Reema Thareja',
+                rating: '4.6★',
+                category: 'programming',
+                cover: 'https://m.media-amazon.com/images/I/61Z95xRpl9L._SY425_.jpg'
+            },
+            {
+                id: 3,
+                title: 'Algorithms with Functional Programming',
+                author: 'John David Stone',
+                rating: '4.5★',
+                category: 'programming',
+                cover: 'https://media.springernature.com/w316/springer-static/cover-hires/book/978-3-662-57970-1?as=webp'
+            },
+            {
+                id: 4,
+                title: 'Hands-On Generative AI with Transformers and Diffusion Models',
+                author: 'Omar Sanseviero',
+                rating: '4.8★',
+                category: 'programming',
+                cover: 'https://m.media-amazon.com/images/I/71ycW-J-8OL._SY385_.jpg'
+            },
+            {
+                id: 5,
+                title: 'Designing Machine Learning Systems',
+                author: 'Chip Huyen',
+                rating: '4.9★',
+                category: 'programming',
+                cover: 'https://m.media-amazon.com/images/I/71D7jwoejTL._AC_UY327_FMwebp_QL65_.jpg'
+            },
+            {
+                id: 6,
+                title: 'Microservices Design Patterns with Java',
+                author: 'Sergey Seroukhov',
+                rating: '4.4★',
+                category: 'programming',
+                cover: 'https://m.media-amazon.com/images/I/81bzcBNj59L._SY385_.jpg'
+            },
+            {
+                id: 7,
+                title: 'The Essential Guide to HTML5 and CSS3 Web Design',
+                author: 'Craig Grannell, Victor Sumner, Dionysios Synodinos',
+                rating: '4.5★',
+                category: 'programming',
+                cover: 'https://media.springernature.com/w316/springer-static/cover-hires/book/978-1-4302-3787-7?as=webp'
+            },
+            {
+                id: 8,
+                title: 'The Monk Who Sold His Ferrari',
+                author: 'Robin Sharma',
+                rating: '4.6★',
+                category: 'personal',
+                cover: 'https://m.media-amazon.com/images/I/61OByUf1TfL._SL1275_.jpg'
+            },
+            {
+                id: 9,
+                title: 'Engineering Physics 1',
+                author: 'S.K. Sharma, R.K. Mangal, Rajendra K.Jain',
+                rating: '4.8★',
+                category: 'science',
+                cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1409553219i/19015591.jpg'
+            },
+            {
+                id: 10,
+                title: 'Advanced Chemistry',
+                author: 'K Sesha Maheswaramma',
+                rating: '4.5★',
+                category: 'science',
+                cover: 'https://rukminim2.flixcart.com/image/480/640/xif0q/book/d/f/a/engineering-chemistry-1-e-original-imagxuxkghfjhusc.jpeg?q=90'
+            },
+            {
+                id: 11,
+                title: 'Advanced Calculus',
+                author: 'David Stapleton',
+                rating: '4.7★',
+                category: 'maths',
+                cover: 'https://www.mathworks.com/academia/books/advanced-calculus-for-mathematical-modeling-in-engineering-and-physics-stapleton/_jcr_content/cover.adapt.full.medium.png/1732697136605.png'
+            },
+            {
+                id: 12,
+                title: 'Universal Anthology',
+                author: 'Richard Garnett',
+                rating: '4.9★',
+                category: 'literature',
+                cover: 'https://m.media-amazon.com/images/I/61s3DXiVsmL._SY466_.jpg'
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        function renderBooks(bookList = books) {
+            const grid = document.getElementById('booksGrid');
+            
+            if (bookList.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1;">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <h3>No books found</h3>
+                            <p>Try adjusting your search or filter criteria</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = bookList.map(book => `
+                <div class="book-card">
+                    <div class="book-cover">
+                        <img src="${book.cover}" alt="${book.title}" onerror="this.src='https://via.placeholder.com/220x280/667eea/ffffff?text=${encodeURIComponent(book.title)}'">
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-author">by ${book.author}</div>
+                        <div class="book-rating">${book.rating}</div>
+                        <div class="book-actions">
+                            <button class="btn-small btn-read" onclick="openReader('${book.title}')">Read Now</button>
+                            <button class="btn-small btn-bookmark" onclick="addBookmark('${book.title}')">🔖</button>
+                        </div>
+                        <button class="btn-small btn-download" onclick="downloadBook('${book.title}')" style="margin-top: 8px;">⬇️ Download</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterBooks(category) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const filtered = category === 'all' ? books : books.filter(b => b.category === category);
+            renderBooks(filtered);
+        }
+
+        function searchBooks() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = books.filter(b => 
+                b.title.toLowerCase().includes(query) || 
+                b.author.toLowerCase().includes(query)
+            );
+            renderBooks(filtered);
+        }
+
+        function openReader(bookTitle) {
+            alert(`📖 Opening: ${bookTitle}\n\nYou can now read, highlight, and take notes!`);
+        }
+
+        function downloadBook(bookTitle) {
+            alert(`⬇️ Downloading: ${bookTitle}\n\nFile will be saved to your device.`);
+        }
+
+        function addBookmark(bookTitle) {
+            alert(`✅ Bookmarked: ${bookTitle}\n\nYou can access this from your bookmarks section.`);
+        }
+
+        // Search on Enter key
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchBooks();
+                }
+            });
+        });
+
+        // Initialize
+        renderBooks();
+    </script>
+</body>
+</html>

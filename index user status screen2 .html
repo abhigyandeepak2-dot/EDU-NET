@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User status</title>
+  <style>
+    *{box-sizing:border-box;font-family:system-ui,sans-serif;}
+    body{
+      margin:0;background:#0f172a;color:#111827;
+      display:flex;align-items:center;justify-content:center;min-height:100vh;
+    }
+    .card{
+      width:100%;max-width:520px;background:#ffffff;border-radius:16px;
+      box-shadow:0 18px 36px rgba(15,23,42,.4);padding:18px 20px;
+    }
+    h1{margin:0 0 4px;font-size:22px;}
+    .subtitle{margin:0 0 14px;font-size:13px;color:#6b7280;}
+
+    .status-banner{
+      border-radius:12px;padding:10px 12px;margin-bottom:12px;
+      display:flex;gap:8px;align-items:flex-start;font-size:13px;
+    }
+    .status-banner.warning{background:#fffbeb;border:1px solid #fbbf24;}
+    .status-banner.restricted{background:#fef2f2;border:1px solid #ef4444;}
+    .status-banner.ok{background:#ecfdf5;border:1px solid #22c55e;}
+
+    .icon{
+      width:22px;height:22px;border-radius:999px;display:flex;
+      align-items:center;justify-content:center;font-size:14px;
+    }
+    .warning .icon{background:#facc15;color:#92400e;}
+    .restricted .icon{background:#fecaca;color:#b91c1c;}
+    .ok .icon{background:#bbf7d0;color:#166534;}
+
+    .banner-text strong{display:block;margin-bottom:2px;}
+
+    h2{margin:12px 0 6px;font-size:14px;}
+    ul{margin:0;padding-left:18px;font-size:13px;color:#374151;}
+    li{margin-bottom:3px;}
+
+    table{
+      width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;
+    }
+    th,td{padding:6px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
+    th{color:#6b7280;font-weight:500;}
+
+    .badge{
+      padding:2px 6px;border-radius:999px;font-size:11px;display:inline-block;
+    }
+    .badge-warn{background:#fef3c7;color:#92400e;}
+    .badge-restrict{background:#fee2e2;color:#b91c1c;}
+    .badge-ban{background:#e5e7eb;color:#374151;}
+
+    .footer{
+      margin-top:10px;font-size:11px;color:#6b7280;
+    }
+    .footer a{color:#2563eb;text-decoration:none;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Your account status</h1>
+    <p class="subtitle">
+      This page shows any warnings or limits on your one‑to‑one sessions.
+    </p>
+
+    <!-- Example: user currently restricted -->
+    <div class="status-banner restricted" id="currentBanner">
+      <div class="icon">!</div>
+      <div class="banner-text">
+        <strong>Temporary chat restriction (2 days left)</strong>
+        You can still join sessions, but your text chat is disabled because of abusive
+        language in a previous class.
+      </div>
+    </div>
+
+    <h2>Active restrictions</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Details</th>
+          <th>Expires</th>
+        </tr>
+      </thead>
+      <tbody id="activeBody">
+        <!-- rows added by JS -->
+      </tbody>
+    </table>
+
+    <h2>Previous actions</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Action</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody">
+        <!-- rows added by JS -->
+      </tbody>
+    </table>
+
+    <div class="footer">
+      Think there is a mistake?
+      <a href="#">Submit an appeal</a> or contact your teacher.
+    </div>
+  </div>
+
+  <script>
+    // Example data; in real app this comes from backend
+    const activeRestrictions = [
+      {
+        type:"Chat restricted",
+        expires:"22 Dec 2025, 6:00 PM",
+        reason:"Abusive language towards teacher"
+      }
+    ];
+
+    const pastActions = [
+      {
+        date:"15 Dec 2025",
+        action:"Warning",
+        reason:"Rude messages in group chat"
+      },
+      {
+        date:"10 Dec 2025",
+        action:"Temporary block (1 day)",
+        reason:"Sharing personal contact info in chat"
+      }
+    ];
+
+    const activeBody = document.getElementById("activeBody");
+    const historyBody = document.getElementById("historyBody");
+    const banner = document.getElementById("currentBanner");
+
+    function renderActive(){
+      activeBody.innerHTML = "";
+      if (!activeRestrictions.length){
+        banner.className = "status-banner ok";
+        banner.innerHTML = `
+          <div class="icon">✓</div>
+          <div class="banner-text">
+            <strong>No active restrictions</strong>
+            Your account is in good standing. Please continue to follow the Code of Conduct.
+          </div>
+        `;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="3" style="font-size:12px;color:#6b7280;">
+          You have no active warnings or restrictions.
+        </td>`;
+        activeBody.appendChild(tr);
+        return;
+      }
+
+      activeRestrictions.forEach(r=>{
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="badge badge-restrict">${r.type}</span></td>
+          <td>${r.reason}</td>
+          <td>${r.expires}</td>
+        `;
+        activeBody.appendChild(tr);
+      });
+    }
+
+    function renderHistory(){
+      historyBody.innerHTML = "";
+      if (!pastActions.length){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="3" style="font-size:12px;color:#6b7280;">
+          No previous actions on your account.
+        </td>`;
+        historyBody.appendChild(tr);
+        return;
+      }
+
+      pastActions.forEach(a=>{
+        const badgeClass =
+          a.action.startsWith("Warning") ? "badge-warn" :
+          a.action.includes("block") ? "badge-ban" : "badge-restrict";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${a.date}</td>
+          <td><span class="badge ${badgeClass}">${a.action}</span></td>
+          <td>${a.reason}</td>
+        `;
+        historyBody.appendChild(tr);
+      });
+    }
+
+    renderActive();
+    renderHistory();
+  </script>
+</body>
+</html>

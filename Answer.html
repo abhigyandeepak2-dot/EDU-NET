@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doubt Answer & Response</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            position: relative;
+        }
+        .back-btn {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(-2px);
+        }
+        .doubt-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .doubt-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            text-align: center;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 15px;
+        }
+        .status-badge {
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .status-answered { background: #d4edda; color: #155724; }
+        .content-section {
+            padding: 40px;
+        }
+        .question-section {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .question-text {
+            font-size: 18px;
+            line-height: 1.7;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .question-attachments {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .answer-section {
+            background: white;
+            border: 2px solid #e3f2fd;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .answer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e3f2fd;
+        }
+        .teacher-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .teacher-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .teacher-details h4 {
+            margin-bottom: 2px;
+            color: #333;
+        }
+        .answer-rating {
+            display: flex;
+            gap: 5px;
+        }
+        .star { color: #ffc107; }
+        .answer-text {
+            font-size: 18px;
+            line-height: 1.7;
+            color: #333;
+            margin-bottom: 25px;
+        }
+        .answer-attachments {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .attachment-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border-radius: 25px;
+            text-decoration: none;
+            color: #333;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        .attachment-link:hover {
+            background: #e3f2fd;
+            transform: translateY(-1px);
+        }
+        .helpful-actions {
+            display: flex;
+            gap: 20px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #e3f2fd;
+        }
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+        .btn-helpful { background: #28a745; color: white; }
+        .btn-helpful:hover { background: #218838; transform: translateY(-2px); }
+        .btn-not-helpful { background: #ffc107; color: #333; }
+        .btn-not-helpful:hover { background: #e0a800; transform: translateY(-2px); }
+        .comments-section {
+            margin-top: 40px;
+        }
+        .comments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .comment-count {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        .comment-form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+        .comment-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 15px;
+        }
+        .comment-submit {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .comment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .comment-item {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .comment-author {
+            font-weight: 600;
+            color: #333;
+        }
+        .comment-time {
+            color: #666;
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .doubt-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .answer-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            .helpful-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="history.back()">← Back to Dashboard</button>
+            <h1 class="doubt-title">Integration by Parts Confusion</h1>
+            <div class="doubt-meta">
+                <div class="meta-item">
+                    <span>📚</span>
+                    <span>Mathematics</span>
+                </div>
+                <div class="meta-item">
+                    <span>📅</span>
+                    <span>Submitted 3 days ago</span>
+                </div>
+                <div class="meta-item">
+                    <span class="status-badge status-answered">✅ Answered</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <!-- Original Question -->
+            <div class="question-section">
+                <h3 style="color: #333; margin-bottom: 15px;">Your Question:</h3>
+                <div class="question-text">
+                    I'm stuck on integration by parts formula. When to use which part as u and dv? I keep getting wrong answers and I'm confused about the order of operations.
+                </div>
+                <div class="question-attachments">
+                    <a href="#" class="attachment-link">
+                        📎 integral_problem.jpg
+                    </a>
+                </div>
+            </div>
+
+            <!-- Teacher Answer -->
+            <div class="answer-section">
+                <div class="answer-header">
+                    <div class="teacher-info">
+                        <div class="teacher-avatar">RS</div>
+                        <div class="teacher-details">
+                            <h4>Prof. Raman Sharma</h4>
+                            <div>Mathematics Department Head</div>
+                        </div>
+                    </div>
+                    <div class="answer-rating">
+                        <span class="star">⭐</span>
+                        <span class="star">⭐</span>
+                        <span class="star">⭐</span>
+                        <span class="star">⭐</span>
+                        <span class="star">⭐</span>
+                        <span>(127 ratings)</span>
+                    </div>
+                </div>
+                <div class="answer-text">
+                    Great question! The key to integration by parts is the <strong>LIATE rule</strong> which helps you decide which function to choose as <em>u</em>:<br><br>
+                    
+                    <strong>L</strong>ogarithmic → <strong>I</strong>nverse trig → <strong>A</strong>lgebraic → <strong>T</strong>rigonometric → <strong>E</strong>xponential<br><br>
+                    
+                    Choose the function highest on the LIATE order as <em>u</em>, and <em>dv</em> will be what's left. Here's your example worked out:<br><br>
+                    
+                    ∫x²sin(x)dx → Let <em>u</em> = x² (Algebraic), <em>dv</em> = sin(x)dx (Trig)
+                </div>
+                <div class="answer-attachments">
+                    <a href="#" class="attachment-link">
+                        📊 liate_rule_diagram.png
+                    </a>
+                    <a href="#" class="attachment-link">
+                        📄 worked_solution.pdf
+                    </a>
+                </div>
+                <div class="helpful-actions">
+                    <button class="action-btn btn-helpful">
+                        👍 Helpful (23)
+                    </button>
+                    <button class="action-btn btn-not-helpful">
+                        👎 Not Helpful (1)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="comments-section">
+                <div class="comments-header">
+                    <div class="comment-count">💬 5 Comments</div>
+                </div>
+                <div class="comment-form">
+                    <textarea class="comment-input" placeholder="Add your comment or question about this answer..."></textarea>
+                    <button class="comment-submit">Post Comment</button>
+                </div>
+                <div class="comment-list">
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <span class="comment-author">Priya K.</span>
+                            <span class="comment-time">2 hours ago</span>
+                        </div>
+                        <div>Thank you Professor! The LIATE rule makes perfect sense now. The diagram really helped visualize it.</div>
+                    </div>
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <span class="comment-author">Amit S.</span>
+                            <span class="comment-time">1 day ago</span>
+                        </div>
+                        <div>Does this rule work for definite integrals too? Or only indefinite?</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Interactive features
+        document.querySelectorAll('.attachment-link, .comment-submit, .action-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Simulate click feedback
+                btn.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 150);
+            });
+        });
+
+        // Comment form
+        const commentInput = document.querySelector('.comment-input');
+        const commentSubmit = document.querySelector('.comment-submit');
+        
+        commentSubmit.addEventListener('click', () => {
+            const text = commentInput.value.trim();
+            if (text) {
+                const commentList = document.querySelector('.comment-list');
+                const newComment = document.createElement('div');
+                newComment.className = 'comment-item';
+                newComment.innerHTML = `
+                    <div class="comment-header">
+                        <span class="comment-author">You</span>
+                        <span class="comment-time">Just now</span>
+                    </div>
+                    <div>${text}</div>
+                `;
+                commentList.insertBefore(newComment, commentList.firstChild);
+                commentInput.value = '';
+                document.querySelector('.comment-count').textContent = `💬 ${parseInt(document.querySelector('.comment-count').textContent.match(/\d+/)[0]) + 1} Comments`;
+            }
+        });
+
+        // Helpful buttons
+        document.querySelector('.btn-helpful').addEventListener('click', function() {
+            let count = parseInt(this.textContent.match(/\d+/)[0]);
+            this.textContent = `👍 Helpful (${count + 1})`;
+        });
+    </script>
+</body>
+</html>

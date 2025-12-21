@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Timetable Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial; margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); color: #333; padding: 20px; }
+        .header { background: white; padding: 20px; text-align: center; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-bottom: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        button { padding: 10px 20px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { opacity: 0.8; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; text-align: center; border: 1px solid #ddd; }
+        th { background: #667eea; color: white; }
+        .no-timetable { text-align: center; padding: 50px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-calendar-check"></i> Smart Timetable Generator</h1>
+        <p>Click to generate your neat timetable.</p>
+        <button onclick="generateTimetable()"><i class="fas fa-magic"></i> Generate Timetable</button>
+    </div>
+    <div class="container">
+        <div id="timetable"></div>
+    </div>
+    <script>
+        let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+
+        function generateTimetable() {
+            const timetableDiv = document.getElementById('timetable');
+            if (schedules.length === 0) {
+                timetableDiv.innerHTML = '<div class="no-timetable">No schedules found. Add some first!</div>';
+                return;
+            }
+
+            // Group schedules by day of the week
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const timetable = {};
+
+            schedules.forEach(s => {
+                const date = new Date(s.date);
+                const day = days[date.getDay()];
+                if (!timetable[day]) timetable[day] = [];
+                timetable[day].push(`${s.subject} at ${s.time}`);
+            });
+
+            // Build table
+            let html = '<table><tr><th>Time/Day</th>';
+            days.forEach(day => html += `<th>${day}</th>`);
+            html += '</tr>';
+
+            // Assume time slots (you can customize)
+            const timeSlots = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM'];
+            timeSlots.forEach(slot => {
+                html += `<tr><td>${slot}</td>`;
+                days.forEach(day => {
+                    const classes = timetable[day] ? timetable[day].filter(c => c.includes(slot)).join(', ') : '';
+                    html += `<td>${classes}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</table>';
+
+            timetableDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

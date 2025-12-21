@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Folder Organization</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    padding: 30px;
+}
+
+.container{
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+h2{
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.folder{
+    background: #f2f2f2;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.sub{
+    margin-left: 20px;
+    margin-top: 5px;
+}
+
+.file{
+    background: #e8f0ff;
+    padding: 6px;
+    margin: 5px 0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.hidden{
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>📁 Smart Folder Organization</h2>
+    <div id="folders"></div>
+</div>
+
+<script>
+// Sample notes structure (from teacher uploads)
+let notes = JSON.parse(localStorage.getItem("notes")) || [
+    { subject:"Computer Science", year:"1st Year", unit:"Unit 1", file:"intro.pdf" },
+    { subject:"Computer Science", year:"1st Year", unit:"Unit 2", file:"arrays.pdf" },
+    { subject:"Mathematics", year:"2nd Year", unit:"Unit 1", file:"algebra.pdf" },
+    { subject:"Physics", year:"1st Year", unit:"Unit 3", file:"motion.pdf" }
+];
+
+// Group notes
+function groupNotes(){
+    let structure = {};
+
+    notes.forEach(n=>{
+        structure[n.subject] ??= {};
+        structure[n.subject][n.year] ??= {};
+        structure[n.subject][n.year][n.unit] ??= [];
+        structure[n.subject][n.year][n.unit].push(n.file);
+    });
+
+    return structure;
+}
+
+function renderFolders(){
+    let data = groupNotes();
+    let container = document.getElementById("folders");
+    container.innerHTML = "";
+
+    for(let subject in data){
+        let sDiv = document.createElement("div");
+        sDiv.className = "folder";
+        sDiv.innerText = "📂 " + subject;
+        sDiv.onclick = ()=> toggle(sDiv.nextSibling);
+        container.appendChild(sDiv);
+
+        let yearDiv = document.createElement("div");
+        yearDiv.className = "sub hidden";
+
+        for(let year in data[subject]){
+            let y = document.createElement("div");
+            y.className = "folder";
+            y.innerText = "📁 " + year;
+            y.onclick = ()=> toggle(y.nextSibling);
+            yearDiv.appendChild(y);
+
+            let unitDiv = document.createElement("div");
+            unitDiv.className = "sub hidden";
+
+            for(let unit in data[subject][year]){
+                let u = document.createElement("div");
+                u.className = "folder";
+                u.innerText = "📘 " + unit;
+                u.onclick = ()=> toggle(u.nextSibling);
+                unitDiv.appendChild(u);
+
+                let files = document.createElement("div");
+                files.className = "sub hidden";
+
+                data[subject][year][unit].forEach(file=>{
+                    files.innerHTML += `<div class="file">📄 ${file}</div>`;
+                });
+
+                unitDiv.appendChild(files);
+            }
+
+            yearDiv.appendChild(unitDiv);
+        }
+
+        container.appendChild(yearDiv);
+    }
+}
+
+function toggle(el){
+    el.classList.toggle("hidden");
+}
+
+renderFolders();
+</script>
+
+</body>
+</html>

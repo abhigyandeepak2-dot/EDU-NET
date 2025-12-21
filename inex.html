@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edu-Net Messages & Pinning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: white;
+        }
+
+        /* Header */
+        .chat-header {
+            background: linear-gradient(135deg, #2180A5 0%, #1a6485 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .header-text h2 {
+            font-size: 16px;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .header-text p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .online-indicator {
+            width: 10px;
+            height: 10px;
+            background: #31a24c;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .header-actions button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            transition: opacity 0.3s;
+        }
+
+        .header-actions button:hover {
+            opacity: 0.8;
+        }
+
+        /* Pinned Section */
+        .pinned-banner {
+            background: #fff8e1;
+            border-bottom: 2px solid #ffc107;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+
+        .pinned-banner::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .pinned-banner::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .pinned-banner::-webkit-scrollbar-thumb {
+            background: #ffc107;
+            border-radius: 2px;
+        }
+
+        .pinned-label {
+            font-weight: 600;
+            font-size: 12px;
+            color: #f39c12;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pinned-items {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .pinned-item {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #2c3e50;
+            white-space: nowrap;
+            border: 2px solid #2180A5;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pinned-item:hover {
+            background: #e8f4f8;
+            transform: scale(1.05);
+        }
+
+        .pinned-item-pin {
+            margin-right: 6px;
+        }
+
+        /* Messages Section */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f5f5f5;
+        }
+
+        .messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 3px;
+        }
+
+        .message-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-group.sent {
+            justify-content: flex-end;
+        }
+
+        .message-group.received {
+            justify-content: flex-start;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #2180A5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .message-content-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+            max-width: 75%;
+        }
+
+        .message-content-wrapper.sent {
+            flex-direction: row-reverse;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 100%;
+            word-wrap: break-word;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .message-bubble:hover {
+            transform: translateX(-8px);
+        }
+
+        .message-bubble.sent:hover {
+            transform: translateX(8px);
+        }
+
+        .message-bubble.red {
+            background: #ffcccc;
+            color: #c0152f;
+            font-weight: 600;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .message-bubble.yellow {
+            background: #ffe8b6;
+            color: #e67e22;
+            border-left: 4px solid #f39c12;
+        }
+
+        .message-bubble.blue {
+            background: #cce5ff;
+            color: #0066cc;
+            border-left: 4px solid #3498db;
+        }
+
+        .message-bubble.sent {
+            background: #dcf8c6;
+            color: #075e54;
+            border-left: 4px solid #25d366;
+        }
+
+        .message-sender {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .message-text {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .message-group:hover .message-actions {
+            opacity: 1;
+        }
+
+        .pin-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pin-btn:hover {
+            background: rgba(0,0,0,0.1);
+            transform: scale(1.2);
+        }
+
+        .pin-btn.pinned {
+            background: #ffc107;
+            transform: scale(1.3);
+        }
+
+        .more-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .more-btn:hover {
+            background: rgba(0,0,0,0.1);
+        }
+
+        /* Input Section */
+        .message-input-container {
+            padding: 12px 16px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s;
+            color: #2180A5;
+        }
+
+        .input-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .input-field {
+            flex: 1;
+            border: 2px solid #e0e0e0;
+            border-radius: 24px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            max-height: 100px;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #2180A5;
+        }
+
+        .send-btn {
+            background: #2180A5;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .send-btn:hover {
+            background: #1a6485;
+            transform: scale(1.1);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(150px);
+            background: #2180A5;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            z-index: 1000;
+            animation: slideUp 0.3s ease forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .message-content-wrapper {
+                max-width: 90%;
+            }
+
+            .pinned-banner {
+                padding: 10px 12px;
+            }
+
+            .pinned-label {
+                font-size: 11px;
+            }
+
+            .pinned-item {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="header-info">
+                <div class="header-avatar">👥</div>
+                <div class="header-text">
+                    <h2>Class A - Announcements</h2>
+                    <p>40 members <span style="margin: 0 4px;">•</span> <span style="display: inline-flex; align-items: center; gap: 4px;"><span class="online-indicator"></span>Active</span></p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button title="Search">🔍</button>
+                <button title="Options">⋮</button>
+            </div>
+        </div>
+
+        <!-- Pinned Section -->
+        <div class="pinned-banner" id="pinnedBanner">
+            <div class="pinned-label">📌 PINNED</div>
+            <div class="pinned-items" id="pinnedItems">
+                <!-- Pinned messages will appear here -->
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="messages-container" id="messagesContainer">
+            <!-- Messages will be added here -->
+        </div>
+
+        <!-- Input -->
+        <div class="message-input-container">
+            <div class="input-actions">
+                <button class="input-btn" title="Attachments">📎</button>
+                <button class="input-btn" title="Emoji">😊</button>
+            </div>
+            <textarea class="input-field" id="messageInput" placeholder="Type announcement..." rows="1"></textarea>
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        let messages = [
+            {
+                id: 1,
+                sender: 'Prof. John Smith',
+                avatar: 'JS',
+                text: '📚 Mid-term Exam Schedule Released - Exams will be held from March 15-20, 2025',
+                
+                time: '10:30 AM',
+                pinned: true
+            },
+            {
+                id: 2,
+                sender: 'Principal Office',
+                avatar: 'PO',
+                text: '🎉 Spring Break Holiday - Classes will be closed from April 5-12, 2025',
+            
+                time: '9:45 AM',
+                pinned: true
+            },
+            {
+                id: 3,
+                sender: 'Dr. Sarah Johnson',
+                avatar: 'SJ',
+                text: '🧪 Lab Session Changed - Science lab moved from Wed to Thursday at 2:00 PM',
+                
+                time: '8:15 AM',
+                pinned: false
+            },
+            {
+                id: 4,
+                sender: 'You',
+                avatar: 'ME',
+                text: '✅ Assignment deadline extended to Friday',
+                type: 'sent',
+                time: '7:30 AM',
+                pinned: false
+            },
+            {
+                id: 5,
+                sender: 'Prof. Michael Chen',
+                avatar: 'MC',
+                text: '📖 New study material uploaded - Chapter 5 summary available in resources',
+                
+                time: 'Yesterday',
+                pinned: false
+            }
+        ];
+
+        function renderMessages() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = messages.map(msg => `
+                <div class="message-group ${msg.type === 'sent' ? 'sent' : 'received'}">
+                    ${msg.type !== 'sent' ? `<div class="message-avatar">${msg.avatar}</div>` : ''}
+                    <div class="message-content-wrapper ${msg.type === 'sent' ? 'sent' : ''}">
+                        <div>
+                            ${msg.type !== 'sent' ? `<div class="message-sender">${msg.sender}</div>` : ''}
+                            <div class="message-bubble ${msg.type}">
+                                <div class="message-text">${msg.text}</div>
+                                <div class="message-time">${msg.time}</div>
+                            </div>
+                        </div>
+                        <div class="message-actions">
+                            <button class="pin-btn ${msg.pinned ? 'pinned' : ''}" onclick="togglePin(${msg.id})" title="${msg.pinned ? 'Unpin' : 'Pin'}">📌</button>
+                            <button class="more-btn" onclick="showOptions(${msg.id})">⋮</button>
+                        </div>
+                    </div>
+                    ${msg.type === 'sent' ? `<div class="message-avatar">${msg.avatar}</div>` : ''}
+                </div>
+            `).join('');
+
+            scrollToBottom();
+        }
+
+        function renderPinned() {
+            const pinnedMessages = messages.filter(m => m.pinned);
+            const container = document.getElementById('pinnedItems');
+            
+            if (pinnedMessages.length === 0) {
+                document.getElementById('pinnedBanner').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('pinnedBanner').style.display = 'flex';
+            container.innerHTML = pinnedMessages.map(msg => `
+                <div class="pinned-item" title="${msg.text}" onclick="viewPinned(${msg.id})">
+                    <span class="pinned-item-pin">📌</span>${msg.sender}
+                </div>
+            `).join('');
+        }
+
+        function togglePin(id) {
+            const msg = messages.find(m => m.id === id);
+            if (msg) {
+                msg.pinned = !msg.pinned;
+                renderMessages();
+                renderPinned();
+                showToast(msg.pinned ? `📌 "${msg.text.substring(0, 20)}..." pinned` : `📌 Message unpinned`);
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            const newMsg = {
+                id: messages.length + 1,
+                sender: 'You',
+                avatar: 'ME',
+                text: text,
+                type: 'sent',
+                time: 'now',
+                pinned: false
+            };
+
+            messages.push(newMsg);
+            input.value = '';
+            input.style.height = 'auto';
+            renderMessages();
+            renderPinned();
+        }
+
+        function showOptions(id) {
+            alert('More options for message #' + id);
+        }
+
+        function viewPinned(id) {
+            const msg = messages.find(m => m.id === id);
+            if (msg) {
+                showToast(`📌 Pinned: "${msg.text}"`);
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('messagesContainer');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Auto-expand textarea
+        document.getElementById('messageInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        // Send on Enter
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Initialize
+        renderMessages();
+        renderPinned();
+    </script>
+</body>
+</html>

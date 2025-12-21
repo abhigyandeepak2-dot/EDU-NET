@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    padding: 30px;
+}
+
+.container{
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+h2,h3{
+    text-align: center;
+}
+
+select{
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+}
+
+.note{
+    background: #f2f2f2;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.empty{
+    text-align: center;
+    color: #777;
+    margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>🎓 Student Dashboard</h2>
+
+    <h3>Select Subject</h3>
+    <select id="subjectSelect" onchange="filterNotes()">
+        <option value="">All Subjects</option>
+        <option>Computer Science</option>
+        <option>Mathematics</option>
+        <option>Physics</option>
+    </select>
+
+    <div id="notesList"></div>
+
+</div>
+
+<script>
+let notes = JSON.parse(localStorage.getItem("notes")) || [];
+
+function filterNotes(){
+    let subject = document.getElementById("subjectSelect").value;
+    let list = document.getElementById("notesList");
+    list.innerHTML = "";
+
+    let filtered = subject === "" 
+        ? notes 
+        : notes.filter(n => n.subject === subject);
+
+    if(filtered.length === 0){
+        list.innerHTML = "<p class='empty'>No notes available.</p>";
+        return;
+    }
+
+    filtered.forEach(note=>{
+        let fileName = note.file.split("\\\\").pop();
+        list.innerHTML += `
+            <div class="note">
+                📄 ${note.subject} - ${fileName}
+            </div>
+        `;
+    });
+}
+
+filterNotes();
+</script>
+
+</body>
+</html>

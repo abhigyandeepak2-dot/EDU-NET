@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Doubts Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px 15px 45px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e1e5e9;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .content {
+            padding: 30px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .empty-state svg {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        .doubts-grid {
+            display: grid;
+            gap: 20px;
+        }
+        .doubt-card {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .doubt-card:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .doubt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .doubt-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-answered { background: #d4edda; color: #155724; }
+        .status-in-progress { background: #cce5ff; color: #004085; }
+        .subjects {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .subject-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+        }
+        .doubt-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .attachments {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .attachment {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            font-size: 14px;
+            text-decoration: none;
+            color: #333;
+        }
+        .action-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-view { background: #667eea; color: white; }
+        .btn-edit { background: #ffc107; color: #333; }
+        .btn-delete { background: #dc3545; color: white; }
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-group {
+                justify-content: center;
+            }
+            .doubt-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 My Doubts Dashboard</h1>
+            <p>Track all your submitted questions and their responses</p>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalDoubts">12</div>
+                    <div class="stat-label">Total Doubts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingDoubts">5</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="answeredDoubts">7</div>
+                    <div class="stat-label">Answered</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search doubts by title or subject...">
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="pending">Pending</button>
+                <button class="filter-btn" data-filter="answered">Answered</button>
+                <button class="filter-btn" data-filter="in-progress">In Progress</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="doubts-grid" id="doubtsGrid">
+                <!-- Doubts will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample doubt data (replace with API data)
+        const sampleDoubts = [
+            {
+                id: 1,
+                title: "Integration by parts confusion",
+                subjects: ["Mathematics"],
+                status: "answered",
+                date: "2025-12-18",
+                description: "I'm stuck on integration by parts formula. When to use which part as u and dv?",
+                attachments: ["integral_problem.jpg", "notes.pdf"],
+                teacherResponse: "Check the LIATE rule..."
+            },
+            {
+                id: 2,
+                title: "Quantum mechanics wave function",
+                subjects: ["Physics"],
+                status: "pending",
+                date: "2025-12-20",
+                description: "How does the wave function collapse during measurement?",
+                attachments: []
+            },
+            {
+                id: 3,
+                title: "Python list comprehension syntax",
+                subjects: ["Computer Science"],
+                status: "in-progress",
+                date: "2025-12-19",
+                description: "Difference between [x for x in lst] vs [x for x in lst if condition]",
+                attachments: ["code_snippet.py"]
+            }
+        ];
+
+        let allDoubts = [...sampleDoubts];
+        let currentFilter = 'all';
+
+        function renderDoubts(doubts) {
+            const grid = document.getElementById('doubtsGrid');
+            if (doubts.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 64px;">📭</div>
+                        <h3>No doubts found</h3>
+                        <p>Try adjusting your search or filter options</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = doubts.map(doubt => `
+                <div class="doubt-card" data-id="${doubt.id}">
+                    <button class="action-btn btn-delete" onclick="deleteDoubt(${doubt.id})">🗑️</button>
+                    <div class="doubt-header">
+                        <div>
+                            <div class="doubt-title">${doubt.title}</div>
+                            <div class="subjects">
+                                ${doubt.subjects.map(s => `<span class="subject-tag">${s}</span>`).join('')}
+                            </div>
+                        </div>
+                        <span class="status-badge status-${doubt.status}">${doubt.status.replace('-', ' ').toUpperCase()}</span>
+                    </div>
+                    <div class="doubt-meta">
+                        <span>📅 ${doubt.date}</span>
+                        <span>👤 Prof. Sharma</span>
+                    </div>
+                    <div class="description">${doubt.description}</div>
+                    ${doubt.attachments.length > 0 ? `
+                        <div class="attachments">
+                            ${doubt.attachments.map(file => `
+                                <a href="#" class="attachment">
+                                    📎 ${file}
+                                </a>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    ${doubt.status === 'answered' ? `
+                        <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                            <strong>Teacher Response:</strong> ${doubt.teacherResponse}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            const total = allDoubts.length;
+            const pending = allDoubts.filter(d => d.status === 'pending').length;
+            const answered = allDoubts.filter(d => d.status === 'answered').length;
+            
+            document.getElementById('totalDoubts').textContent = total;
+            document.getElementById('pendingDoubts').textContent = pending;
+            document.getElementById('answeredDoubts').textContent = answered;
+        }
+
+        function filterDoubts() {
+            let filtered = allDoubts;
+            
+            // Status filter
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(doubt => doubt.status === currentFilter);
+            }
+            
+            renderDoubts(filtered);
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allDoubts.filter(doubt => 
+                doubt.title.toLowerCase().includes(query) ||
+                doubt.subjects.some(s => s.toLowerCase().includes(query)) ||
+                doubt.description.toLowerCase().includes(query)
+            );
+            renderDoubts(filtered);
+        });
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                filterDoubts();
+            });
+        });
+
+        // Initial render
+        updateStats();
+        renderDoubts(allDoubts);
+
+        // Sample functions
+        function deleteDoubt(id) {
+            if (confirm('Delete this doubt?')) {
+                allDoubts = allDoubts.filter(d => d.id !== id);
+                updateStats();
+                filterDoubts();
+            }
+        }
+    </script>
+</body>
+</html>

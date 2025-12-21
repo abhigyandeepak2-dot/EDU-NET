@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial; margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); color: #333; padding: 20px; }
+        .header { background: white; padding: 20px; text-align: center; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-bottom: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        h2 { color: #667eea; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 10px; border-bottom: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background: #667eea; color: white; }
+        .notification { background: #fff3cd; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-user-graduate"></i> Student Dashboard</h1>
+        <p>Welcome! See all info posted by your teacher.</p>
+    </div>
+    <div class="container">
+        <div class="section">
+            <h2><i class="fas fa-calendar-day"></i> Today's Schedule</h2>
+            <ul id="today-schedule"></ul>
+        </div>
+        <div class="section">
+            <h2><i class="fas fa-book"></i> Assignments</h2>
+            <ul id="assignments"></ul>
+        </div>
+        <div class="section">
+            <h2><i class="fas fa-chart-line"></i> Grades</h2>
+            <table id="grades"></table>
+        </div>
+        <div class="section">
+            <h2><i class="fas fa-bell"></i> Notifications</h2>
+            <div id="notifications"></div>
+        </div>
+        <div class="section">
+            <h2><i class="fas fa-calendar-alt"></i> Upcoming Events</h2>
+            <ul id="upcoming-events"></ul>
+        </div>
+    </div>
+    <script>
+        // Load data from localStorage (posted by teacher)
+        let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+        let assignments = JSON.parse(localStorage.getItem('assignments')) || [];
+        let grades = JSON.parse(localStorage.getItem('grades')) || [];
+        let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+        let events = JSON.parse(localStorage.getItem('events')) || [];
+
+        function displayTodaySchedule() {
+            const today = new Date().toISOString().split('T')[0];
+            const todaySchedules = schedules.filter(s => s.date === today);
+            document.getElementById('today-schedule').innerHTML = todaySchedules.length ? todaySchedules.map(s => `<li>${s.subject} at ${s.time}</li>`).join('') : '<li>No schedules today.</li>';
+        }
+
+        function displayAssignments() {
+            document.getElementById('assignments').innerHTML = assignments.map(a => `<li>${a.subject}: ${a.task} (Due: ${a.due})</li>`).join('');
+        }
+
+        function displayGrades() {
+            const table = document.getElementById('grades');
+            table.innerHTML = '<tr><th>Subject</th><th>Grade</th></tr>' + grades.map(g => `<tr><td>${g.subject}</td><td>${g.grade}</td></tr>`).join('');
+        }
+
+        function displayNotifications() {
+            document.getElementById('notifications').innerHTML = notifications.map(n => `<div class="notification">${n.title}: ${n.message}</div>`).join('');
+        }
+
+        function displayUpcomingEvents() {
+            document.getElementById('upcoming-events').innerHTML = events.map(e => `<li>${e.title} on ${e.date}</li>`).join('');
+        }
+
+        // Display all on load
+        displayTodaySchedule();
+        displayAssignments();
+        displayGrades();
+        displayNotifications();
+        displayUpcomingEvents();
+    </script>
+</body>
+</html>

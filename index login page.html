@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Scheduling - Login/Signup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); }
+        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); width: 300px; text-align: center; }
+        h2 { color: #667eea; }
+        form { display: flex; flex-direction: column; }
+        .input-group { position: relative; margin: 10px 0; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
+        .input-group i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #aaa; }
+        button { padding: 10px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0; }
+        .toggle a { color: #667eea; text-decoration: none; }
+        .message { margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="login-form">
+            <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+            <form id="login">
+                <div class="input-group"><input type="text" id="login-username" placeholder="Username" required><i class="fas fa-user"></i></div>
+                <div class="input-group"><input type="password" id="login-password" placeholder="Password" required><i class="fas fa-lock"></i></div>
+                <button type="submit"><i class="fas fa-arrow-right"></i> Login</button>
+            </form>
+            <div class="toggle"><a href="#" onclick="showSignup()">Sign up</a></div>
+        </div>
+        <div id="signup-form" style="display:none;">
+            <h2><i class="fas fa-user-plus"></i> Sign Up</h2>
+            <form id="signup">
+                <div class="input-group"><input type="text" id="signup-username" placeholder="Username" required><i class="fas fa-user"></i></div>
+                <div class="input-group"><input type="password" id="signup-password" placeholder="Password" required><i class="fas fa-lock"></i></div>
+                <div class="input-group"><select id="role" required><option value="">Role</option><option value="teacher">Teacher</option><option value="student">Student</option></select><i class="fas fa-graduation-cap"></i></div>
+                <button type="submit"><i class="fas fa-check"></i> Sign Up</button>
+            </form>
+            <div class="toggle"><a href="#" onclick="showLogin()">Login</a></div>
+        </div>
+        <div id="message" class="message"></div>
+    </div>
+    <script>
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        function showSignup() { document.getElementById('login-form').style.display='none'; document.getElementById('signup-form').style.display='block'; document.getElementById('message').textContent=''; }
+        function showLogin() { document.getElementById('signup-form').style.display='none'; document.getElementById('login-form').style.display='block'; document.getElementById('message').textContent=''; }
+        document.getElementById('signup').addEventListener('submit', e => {
+            e.preventDefault();
+            const u = document.getElementById('signup-username').value, p = document.getElementById('signup-password').value, r = document.getElementById('role').value;
+            if (users.find(x => x.username === u)) { document.getElementById('message').textContent='Username exists.'; return; }
+            users.push({username:u, password:p, role:r}); localStorage.setItem('users', JSON.stringify(users));
+            document.getElementById('message').textContent='Account created! Login now.'; showLogin();
+        });
+        document.getElementById('login').addEventListener('submit', e => {
+            e.preventDefault();
+            const u = document.getElementById('login-username').value, p = document.getElementById('login-password').value;
+            const user = users.find(x => x.username === u && x.password === p);
+            document.getElementById('message').textContent = user ? `Welcome, ${user.role}!` : 'Invalid login.';
+        });
+    </script>
+</body>
+</html>

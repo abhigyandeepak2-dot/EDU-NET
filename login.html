@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher & Student Login Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 420px;
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .role-selector {
+            display: flex;
+            margin-bottom: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .role-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .role-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        .role-btn:hover:not(.active) {
+            background: #e9ecef;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .email-hint {
+            font-size: 14px;
+            color: #888;
+            margin-top: 5px;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .error-msg {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .success-msg {
+            color: #27ae60;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 25px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Institutional Login Portal</h1>
+        
+        <div class="role-selector">
+            <button class="role-btn active" data-role="teacher">Teacher</button>
+            <button class="role-btn" data-role="student">Student</button>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Institutional Email</label>
+                <input type="email" id="email" placeholder="teacher@college.edu or student@college.edu" required>
+                <div class="email-hint">Use your official college email (e.g., @college.edu)</div>
+                <div class="error-msg" id="emailError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+                <div class="error-msg" id="passwordError"></div>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">Login as <span id="roleDisplay">Teacher</span></button>
+            <div class="success-msg" id="successMsg"></div>
+        </form>
+    </div>
+
+    <script>
+        const roleBtns = document.querySelectorAll('.role-btn');
+        const roleDisplay = document.getElementById('roleDisplay');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+        const successMsg = document.getElementById('successMsg');
+
+        let currentRole = 'teacher';
+
+        // Role selection
+        roleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                roleBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentRole = btn.dataset.role;
+                roleDisplay.textContent = btn.textContent;
+                clearErrors();
+            });
+        });
+
+        // Real-time email validation for institutional domain
+        emailInput.addEventListener('input', validateEmail);
+        passwordInput.addEventListener('input', validatePassword);
+
+        function validateEmail() {
+            const email = emailInput.value.trim();
+            const institutionalDomains = ['@college.edu', '@university.edu', '@school.edu']; // Customize as needed
+            const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            const isInstitutional = institutionalDomains.some(domain => email.endsWith(domain));
+
+            if (email && isValidEmail && isInstitutional) {
+                emailError.style.display = 'none';
+                return true;
+            } else if (email) {
+                emailError.textContent = currentRole === 'teacher' 
+                    ? 'Please use faculty email (e.g., teacher@college.edu)' 
+                    : 'Please use student email (e.g., student@college.edu)';
+                emailError.style.display = 'block';
+            }
+            return false;
+        }
+
+        function validatePassword() {
+            const password = passwordInput.value;
+            if (password.length >= 6) {
+                passwordError.style.display = 'none';
+                return true;
+            } else if (password) {
+                passwordError.textContent = 'Password must be at least 6 characters';
+                passwordError.style.display = 'block';
+            }
+            return false;
+        }
+
+        function clearErrors() {
+            emailError.style.display = 'none';
+            passwordError.style.display = 'none';
+            successMsg.style.display = 'none';
+        }
+
+        // Form submission
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            clearErrors();
+
+            const isEmailValid = validateEmail();
+            const isPasswordValid = validatePassword();
+
+            if (isEmailValid && isPasswordValid) {
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'Verifying...';
+
+                // Simulate API call (replace with real backend integration)
+                setTimeout(() => {
+                    successMsg.textContent = `Welcome, ${currentRole}! Redirecting to ${currentRole} dashboard...`;
+                    successMsg.style.display = 'block';
+                    
+                    // In production: 
+                    // fetch('/api/login', { method: 'POST', body: JSON.stringify({ email, password, role: currentRole }) })
+                    // .then(() => window.location.href = `/${currentRole}-dashboard`);
+                    
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = `Login as ${roleDisplay.textContent}`;
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+</html>

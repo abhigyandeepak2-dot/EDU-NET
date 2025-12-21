@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edu-Net E-Books - Read & Download</title>
+    <style>
+        :root {
+            --primary: #36e0fa ;
+            --primary-hover: #1a6485;
+            --primary-light: #e8f4f8;
+            --secondary: #f39c12;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --border: #ecf0f1;
+            --bg: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a6485 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .book-showcase {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .book-cover-section {
+            text-align: center;
+        }
+
+        .book-cover {
+            width: 100%;
+            max-width: 250px;
+            height: 350px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            padding: 20px;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .book-info-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .book-author {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .book-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .book-rating {
+            color: var(--secondary);
+            font-size: 14px;
+        }
+
+        .book-description {
+            color: var(--text-light);
+            line-height: 1.6;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 128, 165, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: var(--border);
+            color: var(--text);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-light);
+        }
+
+        .reading-options {
+            background-color: var(--primary-light);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .reading-options-title {
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .options-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            padding: 8px 16px;
+            background-color: white;
+            color: var(--text);
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 12px;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .option-btn:hover,
+        .option-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .download-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .download-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .download-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .info-label {
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .info-value {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .progress-section {
+            margin-top: 15px;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .progress-bar {
+            background-color: var(--border);
+            border-radius: 8px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            height: 100%;
+            width: 65%;
+            animation: progress 2s ease;
+        }
+
+        @keyframes progress {
+            from { width: 0; }
+            to { width: 65%; }
+        }
+
+        .progress-percent {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 6px;
+            text-align: right;
+        }
+
+        .continue-reading {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .reading-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .reading-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+
+        .reading-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .reading-card-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .reading-card-progress {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .reading-progress-bar {
+            background-color: var(--border);
+            border-radius: 6px;
+            height: 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .reading-progress-fill {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%);
+            height: 100%;
+        }
+
+        .reading-card-action {
+            margin-top: 12px;
+        }
+
+        .reading-card-action button {
+            width: 100%;
+            padding: 8px;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .reading-card-action button:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .book-showcase {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .download-info {
+                grid-template-columns: 1fr;
+            }
+
+            .reading-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>📚 E-Books Library</h1>
+            <p>Access and download your learning materials</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Featured Book Section -->
+        <div class="book-showcase">
+            <!-- Book Cover -->
+            <div class="book-cover-section">
+             <img src="https://m.media-amazon.com/images/I/71ycW-J-8OL._SY385_.jpg" alt="Book ">   
+            </div>
+
+            <!-- Book Info -->
+            <div class="book-info-section">
+                <h2 class="book-title">Generative AI with Transformers and Diffusion Models</h2>
+                <p class="book-author">By: Omar Sanseviero</p>
+
+                <div class="book-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Rating</span>
+                        <span class="book-rating">⭐ 4.6/5.0 (342 reviews)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Pages</span>
+                        <span class="meta-value">418</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Reading Time</span>
+                        <span class="meta-value">~11 hours</span>
+                    </div>
+                </div>
+
+                <p class="book-description">
+                    Comprehensive guide to Generative AI concepts including Model fine-tuning , prompt engineering & RAG implementation. Perfect for Artificial Intelligence and Machie Learning studies.
+                </p>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="startReading()">📖 Read Now</button>
+                    <button class="btn btn-primary" onclick="downloadBook()">⬇️ Download PDF</button>
+                </div>
+
+                <!-- Reading Options -->
+                <div class="reading-options">
+                    <div class="reading-options-title">Reading Format</div>
+                    <div class="options-grid">
+                        <button class="option-btn " onclick="selectFormat('online')">🌐 Online Reader</button>
+                        <button class="option-btn active" onclick="selectFormat('pdf')">📄 PDF</button>
+                    </div>
+                </div>
+
+                <!-- Download Section -->
+                <div class="download-section">
+                    <div class="download-title">📥 Download Information</div>
+                    <div class="download-info">
+                        <div class="info-row">
+                            <span class="info-label">File Size:</span>
+                            <span class="info-value">45.3 MB</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Format:</span>
+                            <span class="info-value">PDF</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Est. Time:</span>
+                            <span class="info-value">~3 minutes</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Downloads:</span>
+                            <span class="info-value">12,450</span>
+                        </div>
+                    </div>
+
+                    <!-- Download Progress -->
+                    <div class="progress-section">
+                        <div class="progress-label">Download Progress</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="progress-percent">65% Complete</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Continue Reading Section -->
+        <div class="continue-reading">
+            <h2 class="section-title">⏱️ Continue Reading</h2>
+            <div class="reading-list">
+                <!-- Reading Card 1 -->
+                <div class="reading-card">
+                    <div class="reading-card-title">Calculus Fundamentals</div>
+                    <div class="reading-card-progress">Chapter 3 • Page 87 of 320</div>
+                    <div class="reading-progress-bar">
+                        <div class="reading-progress-fill" style="width: 35%;"></div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-light); margin-bottom: 12px;">Last read: 2 hours ago</div>
+                    <div class="reading-card-action">
+                        <button onclick="continueReading('Calculus Fundamentals')">Continue →</button>
+                    </div>
+                </div>
+
+                <!-- Reading Card 2 -->
+                <div class="reading-card">
+                    <div class="reading-card-title">English Literature</div>
+                    <div class="reading-card-progress">Chapter 5 • Page 156 of 280</div>
+                    <div class="reading-progress-bar">
+                        <div class="reading-progress-fill" style="width: 62%;"></div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-light); margin-bottom: 12px;">Last read: 1 day ago</div>
+                    <div class="reading-card-action">
+                        <button onclick="continueReading('English Literature')">Continue →</button>
+                    </div>
+                </div>
+
+                <!-- Reading Card 3 -->
+                <div class="reading-card">
+                    <div class="reading-card-title">World History</div>
+                    <div class="reading-card-progress">Chapter 2 • Page 45 of 420</div>
+                    <div class="reading-progress-bar">
+                        <div class="reading-progress-fill" style="width: 18%;"></div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-light); margin-bottom: 12px;">Last read: 5 days ago</div>
+                    <div class="reading-card-action">
+                        <button onclick="continueReading('World History')">Continue →</button>
+                    </div>
+                </div>
+
+                <!-- Reading Card 4 -->
+                <div class="reading-card">
+                    <div class="reading-card-title">Organic Chemistry</div>
+                    <div class="reading-card-progress">Chapter 7 • Page 234 of 300</div>
+                    <div class="reading-progress-bar">
+                        <div class="reading-progress-fill" style="width: 78%;"></div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-light); margin-bottom: 12px;">Last read: 3 days ago</div>
+                    <div class="reading-card-action">
+                        <button onclick="continueReading('Organic Chemistry')">Continue →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startReading() {
+            alert('📖 Opening Advanced Physics in online reader...\n\nYou can read, highlight, take notes, and bookmark pages.');
+        }
+
+        function downloadBook() {
+            alert('⬇️ Download Started!\n\nFile: Advanced_Physics.pdf\nSize: 45.3 MB\n\nYour file will be saved to Downloads folder.');
+        }
+
+        function selectFormat(format) {
+            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            const formats = { online: 'Online Reader', pdf: 'PDF', epub: 'ePub' };
+            alert(`✅ Selected format: ${formats[format]}`);
+        }
+
+        function continueReading(bookTitle) {
+            alert(`📖 Resuming: ${bookTitle}\n\nOpening at your last reading position...`);
+        }
+    </script>
+</body>
+</html>

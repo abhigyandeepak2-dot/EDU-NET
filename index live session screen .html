@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Live Session</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #020617;
+      color: #e5e7eb;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top bar */
+    .top-bar {
+      height: 52px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #020617;
+      border-bottom: 1px solid #111827;
+    }
+
+    .top-left h1 {
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .top-left span {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .live-pill {
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(239, 68, 68, 0.12);
+      color: #fecaca;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .participants-count {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #0b1120;
+      border: 1px solid #1f2937;
+      font-size: 11px;
+    }
+
+    .end-btn {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: none;
+      background: #ef4444;
+      color: #fef2f2;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Main layout */
+    .main-layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 3fr 1.2fr;
+      gap: 1px;
+      background: #020617;
+    }
+
+    .video-area {
+      background: radial-gradient(circle at top, #0f172a, #020617);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .video-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .video-tile {
+      position: relative;
+      border-radius: 14px;
+      background: #020617;
+      border: 1px solid #111827;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    .video-tile.teacher {
+      grid-row: 1 / span 2;
+      background-image: radial-gradient(circle at 10% 20%, #22c55e, #0ea5e9);
+      background-size: cover;
+      color: #020617;
+    }
+
+    .tile-label {
+      position: absolute;
+      left: 10px;
+      bottom: 8px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.8);
+      color: #e5e7eb;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tile-label.teacher-label {
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .tile-status {
+      position: absolute;
+      right: 10px;
+      top: 8px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.8);
+      font-size: 10px;
+      color: #9ca3af;
+    }
+
+    /* Bottom controls */
+    .controls-bar {
+      height: 60px;
+      padding: 8px 14px;
+      border-top: 1px solid #111827;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      background: rgba(2, 6, 23, 0.96);
+    }
+
+    .control-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.12s, transform 0.06s, border-color 0.12s;
+    }
+
+    .control-btn:hover {
+      background: #111827;
+      transform: translateY(-1px);
+    }
+
+    .control-btn.red {
+      background: #b91c1c;
+      border-color: #fecaca;
+    }
+
+    .control-btn.green {
+      background: #15803d;
+      border-color: #bbf7d0;
+    }
+
+    .control-label {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+      text-align: center;
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 60px;
+    }
+
+    .spacer {
+      width: 24px;
+    }
+
+    /* Chat panel */
+    .chat-panel {
+      background: #020617;
+      border-left: 1px solid #111827;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .chat-header {
+      padding: 10px 12px;
+      border-bottom: 1px solid #111827;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-header h2 {
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .chat-header span {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 10px 10px 0;
+      overflow-y: auto;
+      font-size: 13px;
+    }
+
+    .msg {
+      margin-bottom: 8px;
+      max-width: 90%;
+    }
+
+    .msg-meta {
+      font-size: 10px;
+      color: #6b7280;
+      margin-bottom: 2px;
+    }
+
+    .msg-bubble {
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: #111827;
+    }
+
+    .msg.me {
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .msg.me .msg-bubble {
+      background: #22c55e;
+      color: #022c22;
+    }
+
+    .msg.me .msg-meta {
+      text-align: right;
+    }
+
+    .chat-input {
+      padding: 8px 10px;
+      border-top: 1px solid #111827;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .chat-input input:focus {
+      border-color: #22c55e;
+    }
+
+    .chat-input button {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: none;
+      background: #22c55e;
+      color: #022c22;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .raise-hand {
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid #fbbf24;
+      background: transparent;
+      color: #fbbf24;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+      .chat-panel {
+        height: 45%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="top-left">
+      <h1>Energy Science Doubt‑Clearing with Mr. Sandeep Tyagi</h1>
+      <span>Live · one‑to‑one session</span>
+    </div>
+    <div class="top-right">
+      <span class="live-pill">Live</span>
+      <span class="participants-count">👥 2 participants</span>
+      <button class="end-btn" id="leaveBtn">Leave</button>
+    </div>
+  </div>
+
+  <!-- Main layout -->
+  <div class="main-layout">
+    <!-- Video side -->
+    <div class="video-area">
+      <div class="video-grid">
+        <div class="video-tile teacher">
+          <div class="tile-label teacher-label">Mr. Sandeep Tyagi · Teacher</div>
+          <div class="tile-status">Speaking…</div>
+        </div>
+        <div class="video-tile">
+          <div class="tile-label">You</div>
+          <div class="tile-status" id="myStatus">Mic on · Cam on</div>
+        </div>
+        <div class="video-tile">
+          <div class="tile-label">Screen share</div>
+          <span>Teacher’s screen will appear here</span>
+        </div>
+      </div>
+
+      <!-- Controls bar -->
+      <div class="controls-bar">
+        <div class="control-item">
+          <button class="control-btn red" id="micBtn">🎙️</button>
+          <div class="control-label" id="micLabel">Mute</div>
+        </div>
+
+        <div class="control-item">
+          <button class="control-btn red" id="camBtn">📷</button>
+          <div class="control-label" id="camLabel">Stop cam</div>
+        </div>
+
+        <div class="control-item">
+          <button class="control-btn" id="screenBtn">🖥️</button>
+          <div class="control-label" id="screenLabel">Share</div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="control-item">
+          <button class="control-btn" id="chatToggleBtn">💬</button>
+          <div class="control-label">Chat</div>
+        </div>
+
+        <div class="control-item">
+          <button class="control-btn" id="handBtn">✋</button>
+          <div class="control-label" id="handLabel">Raise</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat panel -->
+    <aside class="chat-panel" id="chatPanel">
+      <div class="chat-header">
+        <div>
+          <h2>Class chat</h2>
+          <span>Be respectful and stay on topic</span>
+        </div>
+        <button class="raise-hand" id="headerHandBtn">✋ Raise hand</button>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg">
+          <div class="msg-meta">Mr. Sharma · 3:25 PM</div>
+          <div class="msg-bubble">Welcome! You can type your doubts in the chat or raise your hand.</div>
+        </div>
+        <div class="msg me">
+          <div class="msg-meta">You · 3:26 PM</div>
+          <div class="msg-bubble">Sir, I have a doubt in Fission&Fussion topic.</div>
+        </div>
+      </div>
+
+      <form class="chat-input" id="chatForm">
+        <input
+          type="text"
+          id="chatInput"
+          placeholder="Type a message…"
+          autocomplete="off"
+        />
+        <button type="submit">Send</button>
+      </form>
+    </aside>
+  </div>
+
+  <script>
+    // Mic / Camera toggle
+    const micBtn = document.getElementById("micBtn");
+    const camBtn = document.getElementById("camBtn");
+    const micLabel = document.getElementById("micLabel");
+    const camLabel = document.getElementById("camLabel");
+    const myStatus = document.getElementById("myStatus");
+
+    let micOn = true;
+    let camOn = true;
+
+    micBtn.addEventListener("click", () => {
+      micOn = !micOn;
+      micBtn.classList.toggle("red", micOn);
+      micBtn.classList.toggle("green", !micOn);
+      micLabel.textContent = micOn ? "Mute" : "Unmute";
+      updateMyStatus();
+    });
+
+    camBtn.addEventListener("click", () => {
+      camOn = !camOn;
+      camBtn.classList.toggle("red", camOn);
+      camBtn.classList.toggle("green", !camOn);
+      camLabel.textContent = camOn ? "Stop cam" : "Start cam";
+      updateMyStatus();
+    });
+
+    function updateMyStatus() {
+      const micText = micOn ? "Mic on" : "Mic off";
+      const camText = camOn ? "Cam on" : "Cam off";
+      myStatus.textContent = `${micText} · ${camText}`;
+    }
+
+    // Screen share (dummy)
+    const screenBtn = document.getElementById("screenBtn");
+    const screenLabel = document.getElementById("screenLabel");
+    let sharing = false;
+    screenBtn.addEventListener("click", () => {
+      sharing = !sharing;
+      screenBtn.classList.toggle("green", sharing);
+      screenLabel.textContent = sharing ? "Stop share" : "Share";
+      alert(sharing ? "Screen sharing started (demo)." : "Screen sharing stopped (demo).");
+    });
+
+    // Chat send
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const chatMessages = document.getElementById("chatMessages");
+
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      const msgEl = document.createElement("div");
+      msgEl.className = "msg me";
+      msgEl.innerHTML = `
+        <div class="msg-meta">You · now</div>
+        <div class="msg-bubble">${text}</div>
+      `;
+      chatMessages.appendChild(msgEl);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      chatInput.value = "";
+    });
+
+    // Raise hand
+    const handBtn = document.getElementById("handBtn");
+    const headerHandBtn = document.getElementById("headerHandBtn");
+    const handLabel = document.getElementById("handLabel");
+    let handRaised = false;
+
+    function toggleHand() {
+      handRaised = !handRaised;
+      handLabel.textContent = handRaised ? "Lower" : "Raise";
+      headerHandBtn.textContent = handRaised ? "✋ Lower hand" : "✋ Raise hand";
+      alert(handRaised ? "Your hand is raised. Teacher will see it." : "You lowered your hand.");
+    }
+
+    handBtn.addEventListener("click", toggleHand);
+    headerHandBtn.addEventListener("click", toggleHand);
+
+    // Chat panel toggle (for small screens)
+    const chatPanel = document.getElementById("chatPanel");
+    const chatToggleBtn = document.getElementById("chatToggleBtn");
+    let chatVisible = true;
+    chatToggleBtn.addEventListener("click", () => {
+      chatVisible = !chatVisible;
+      chatPanel.style.display = chatVisible ? "flex" : "none";
+    });
+
+    // Leave
+    const leaveBtn = document.getElementById("leaveBtn");
+    leaveBtn.addEventListener("click", () => {
+      const ok = confirm("Leave the live session?");
+      if (ok) {
+        window.location.href = "session-lobby.html"; // or your own redirect
+      }
+    });
+  </script>
+</body>
+</html>

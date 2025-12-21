@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Notes Dashboard</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    padding: 30px;
+}
+
+.container{
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+h2,h3{
+    text-align: center;
+}
+
+.cards{
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.card{
+    background: #f2f2f2;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+button{
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background: #667eea;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover{
+    background: #5a67d8;
+}
+
+.section{
+    margin-top: 25px;
+}
+
+.note{
+    padding: 8px;
+    background: #eee;
+    margin: 5px 0;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.category{
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+input, select{
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+}
+
+.hidden{
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+    <h2>📚 Teacher Dashboard</h2>
+
+    <div class="cards">
+        <div class="card">
+            <h3 id="totalNotes">0</h3>
+            <p>Total Uploaded Notes</p>
+        </div>
+    </div>
+
+    <div style="text-align:center;">
+        <button onclick="showUpload()">➕ Upload Notes</button>
+    </div>
+
+    <div class="section">
+        <h3>🕒 Recent Uploads</h3>
+        <div id="recentNotes"></div>
+    </div>
+
+    <div class="section">
+        <h3>📂 Categories</h3>
+        <div id="categories"></div>
+    </div>
+</div>
+
+<!-- UPLOAD NOTES -->
+<div id="upload" class="hidden">
+    <h2>📤 Upload Notes</h2>
+
+    <select id="subject">
+        <option value="">Select Subject</option>
+        <option>Computer Science</option>
+        <option>Mathematics</option>
+        <option>Physics</option>
+    </select>
+
+    <input type="file" id="file">
+
+    <button onclick="uploadNote()">Upload</button>
+    <button onclick="showDashboard()">⬅ Back to Dashboard</button>
+</div>
+
+</div>
+
+<script>
+let notes = JSON.parse(localStorage.getItem("notes")) || [];
+
+function showUpload(){
+    document.getElementById("dashboard").classList.add("hidden");
+    document.getElementById("upload").classList.remove("hidden");
+}
+
+function showDashboard(){
+    document.getElementById("upload").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+    loadDashboard();
+}
+
+function uploadNote(){
+    let subject = document.getElementById("subject").value;
+    let fileInput = document.getElementById("file");
+
+    if(subject === "" || fileInput.value === ""){
+        alert("Please select subject and file");
+        return;
+    }
+
+    notes.push({
+        subject: subject,
+        file: fileInput.value
+    });
+
+    localStorage.setItem("notes", JSON.stringify(notes));
+    fileInput.value = "";
+    document.getElementById("subject").value = "";
+
+    alert("Note uploaded successfully");
+}
+
+function loadDashboard(){
+    document.getElementById("totalNotes").innerText = notes.length;
+
+    // Recent uploads
+    let recent = notes.slice(-3).reverse();
+    let recentDiv = document.getElementById("recentNotes");
+    recentDiv.innerHTML = "";
+
+    recent.forEach(note=>{
+        recentDiv.innerHTML += `
+            <div class="note">📄 ${note.file.split("\\\\").pop()}</div>
+        `;
+    });
+
+    // Categories
+    let count = { pdf:0, ppt:0, doc:0, img:0 };
+
+    notes.forEach(n=>{
+        let ext = n.file.split(".").pop().toLowerCase();
+        if(ext === "pdf") count.pdf++;
+        else if(ext === "ppt" || ext === "pptx") count.ppt++;
+        else if(ext === "doc" || ext === "docx") count.doc++;
+        else count.img++;
+    });
+
+    document.getElementById("categories").innerHTML = `
+        <span class="category">PDFs (${count.pdf})</span>
+        <span class="category">PPTs (${count.ppt})</span>
+        <span class="category">Docs (${count.doc})</span>
+        <span class="category">Images (${count.img})</span>
+    `;
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>

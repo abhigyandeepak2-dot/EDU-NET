@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin / Teacher Review Panel</title>
+  <style>
+    *{box-sizing:border-box;font-family:system-ui,sans-serif;}
+    body{
+      margin:0;background:#f3f4f6;color:#111827;
+      display:flex;align-items:center;justify-content:center;min-height:100vh;
+    }
+    .panel{
+      width:100%;max-width:900px;background:#ffffff;border-radius:14px;
+      box-shadow:0 16px 32px rgba(15,23,42,.18);padding:18px 20px;
+    }
+    h1{margin:0 0 4px;font-size:22px;}
+    .subtitle{margin:0 0 12px;font-size:13px;color:#6b7280;}
+
+    .toolbar{
+      display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;font-size:13px;
+    }
+    .toolbar select,.toolbar input{
+      padding:6px 8px;border-radius:999px;border:1px solid #d1d5db;font-size:13px;
+      background:#fff;
+    }
+    .chips{display:flex;gap:6px;}
+    .chip{
+      padding:5px 10px;border-radius:999px;border:1px solid #d1d5db;
+      font-size:12px;background:#fff;cursor:pointer;
+    }
+    .chip.active{
+      background:#111827;color:#f9fafb;border-color:#111827;
+    }
+
+    table{
+      width:100%;border-collapse:collapse;font-size:13px;background:#fff;
+      border-radius:10px;overflow:hidden;
+    }
+    th,td{padding:8px 10px;border-bottom:1px solid #e5e7eb;text-align:left;}
+    th{background:#f9fafb;color:#4b5563;font-weight:600;}
+    tr:hover td{background:#f9fafb;}
+
+    .badge{
+      padding:2px 6px;border-radius:999px;font-size:11px;display:inline-block;
+    }
+    .status-pending{background:#fef3c7;color:#92400e;}
+    .status-reviewed{background:#dcfce7;color:#166534;}
+    .status-severe{background:#fee2e2;color:#b91c1c;}
+
+    .severity-low{background:#e5e7eb;color:#374151;}
+    .severity-med{background:#dbeafe;color:#1d4ed8;}
+    .severity-high{background:#fee2e2;color:#b91c1c;}
+
+    .actions{display:flex;flex-wrap:wrap;gap:4px;}
+    .btn{
+      padding:4px 8px;border-radius:999px;border:1px solid transparent;
+      font-size:11px;cursor:pointer;background:#fff;
+    }
+    .btn-warn{border-color:#fbbf24;color:#92400e;}
+    .btn-mute{border-color:#ef4444;color:#b91c1c;}
+    .btn-safe{border-color:#22c55e;color:#166534;}
+    .btn-more{border-color:#9ca3af;color:#374151;}
+
+    @media(max-width:720px){
+      table thead{display:none;}
+      table,tbody,tr,td{display:block;width:100%;}
+      tr{border-bottom:1px solid #e5e7eb;margin-bottom:6px;}
+      td{border:none;padding:6px 10px;}
+      td::before{
+        content:attr(data-label);display:block;font-size:11px;color:#9ca3af;
+        text-transform:uppercase;margin-bottom:1px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Reports review</h1>
+    <p class="subtitle">
+      Review reported messages and take action (warn, mute/block, or mark safe).
+    </p>
+
+    <div class="toolbar">
+      <input id="search" placeholder="Search by student / reporter / reason…" />
+      <select id="subjectFilter">
+        <option value="">All subjects</option>
+        <option>Maths</option>
+        <option>Science</option>
+        <option>English</option>
+      </select>
+      <div class="chips">
+        <button class="chip active" data-status="">All</button>
+        <button class="chip" data-status="Pending">Pending</button>
+        <button class="chip" data-status="Reviewed">Reviewed</button>
+        <button class="chip" data-status="Severe">Severe</button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Student / message</th>
+          <th>Reporter</th>
+          <th>Status</th>
+          <th>Severity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const reports = [
+      {
+        id:1,
+        time:"20 Dec · 3:40 PM",
+        student:"Rahul",
+        subject:"Maths",
+        message:"You are stupid, sir.",
+        reporter:"Teacher",
+        status:"Pending",
+        severity:"High"
+      },
+      {
+        id:2,
+        time:"19 Dec · 5:15 PM",
+        student:"Aman",
+        subject:"English",
+        message:"This is useless.",
+        reporter:"Student",
+        status:"Reviewed",
+        severity:"Medium"
+      },
+      {
+        id:3,
+        time:"18 Dec · 6:05 PM",
+        student:"Neha",
+        subject:"Science",
+        message:"Shared phone number in chat.",
+        reporter:"Auto filter",
+        status:"Severe",
+        severity:"High"
+      }
+    ];
+
+    const rowsEl = document.getElementById("rows");
+    const searchEl = document.getElementById("search");
+    const subjectFilter = document.getElementById("subjectFilter");
+    const chips = document.querySelectorAll(".chip");
+
+    let statusFilter = "";
+
+    function render() {
+      const term = searchEl.value.trim().toLowerCase();
+      const subj = subjectFilter.value;
+
+      rowsEl.innerHTML = "";
+
+      const filtered = reports.filter(r => {
+        const matchStatus =
+          !statusFilter ||
+          r.status === statusFilter ||
+          (statusFilter === "Severe" && r.severity === "High");
+        const matchSubject = !subj || r.subject === subj;
+        const matchSearch =
+          !term ||
+          r.student.toLowerCase().includes(term) ||
+          r.reporter.toLowerCase().includes(term) ||
+          r.message.toLowerCase().includes(term);
+        return matchStatus && matchSubject && matchSearch;
+      });
+
+      filtered.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td data-label="Time">${r.time}</td>
+          <td data-label="Student / message">
+            <div><strong>${r.student}</strong> · ${r.subject}</div>
+            <div style="font-size:12px;color:#6b7280;">“${r.message}”</div>
+          </td>
+          <td data-label="Reporter">${r.reporter}</td>
+          <td data-label="Status">
+            <span class="badge ${statusClass(r.status)}">${r.status}</span>
+          </td>
+          <td data-label="Severity">
+            <span class="badge ${severityClass(r.severity)}">${r.severity}</span>
+          </td>
+          <td data-label="Actions">
+            <div class="actions">
+              <button class="btn btn-warn" data-action="warn" data-id="${r.id}">Warn</button>
+              <button class="btn btn-mute" data-action="mute" data-id="${r.id}">Mute / block</button>
+              <button class="btn btn-safe" data-action="safe" data-id="${r.id}">Mark safe</button>
+              <button class="btn btn-more" data-action="escalate" data-id="${r.id}">Escalate</button>
+            </div>
+          </td>
+        `;
+        rowsEl.appendChild(tr);
+      });
+    }
+
+    function statusClass(status){
+      if(status==="Pending")return"status-pending";
+      if(status==="Reviewed")return"status-reviewed";
+      if(status==="Severe")return"status-severe";
+      return"";
+    }
+    function severityClass(sev){
+      if(sev==="Low")return"severity-low";
+      if(sev==="Medium")return"severity-med";
+      if(sev==="High")return"severity-high";
+      return"";
+    }
+
+    searchEl.addEventListener("input",render);
+    subjectFilter.addEventListener("change",render);
+    chips.forEach(ch=>{
+      ch.addEventListener("click",()=>{
+        chips.forEach(c=>c.classList.remove("active"));
+        ch.classList.add("active");
+        statusFilter = ch.dataset.status || "";
+        render();
+      });
+    });
+
+    rowsEl.addEventListener("click",e=>{
+      const btn = e.target.closest("button[data-action]");
+      if(!btn) return;
+      const id = Number(btn.dataset.id);
+      const report = reports.find(r=>r.id===id);
+      const action = btn.dataset.action;
+
+      if(action==="warn"){
+        alert(`Warn student ${report.student} about chat rules.`);
+        report.status = "Reviewed";
+      }else if(action==="mute"){
+        alert(`Mute/block ${report.student} from chat.`);
+        report.status = "Reviewed";
+      }else if(action==="safe"){
+        alert("Marked as safe. No further action.");
+        report.status = "Reviewed";
+      }else if(action==="escalate"){
+        alert("Escalated to school admin for further review.");
+        report.status = "Severe";
+        report.severity = "High";
+      }
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

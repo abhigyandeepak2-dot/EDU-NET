@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Answer Composition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 28px;
+        }
+        .back-btn, .publish-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .publish-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+        .publish-btn:hover:not(:disabled) {
+            background: #ee5a52;
+            transform: translateY(-2px);
+        }
+        .publish-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            min-height: 70vh;
+            gap: 0;
+        }
+        .editor-section {
+            padding: 40px;
+            border-right: 1px solid #e1e5e9;
+        }
+        .preview-section {
+            background: #f8f9fa;
+            padding: 40px;
+        }
+        .question-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .question-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .question-meta {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+        .question-text {
+            color: #555;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+        .toolbar {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .toolbar-btn {
+            padding: 10px 16px;
+            border: 2px solid #e1e5e9;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .toolbar-btn:hover, .toolbar-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        .editor {
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            min-height: 300px;
+            padding: 25px;
+            font-size: 16px;
+            line-height: 1.7;
+            font-family: inherit;
+            resize: vertical;
+            width: 100%;
+            transition: border-color 0.3s ease;
+        }
+        .editor:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .attachments-section {
+            margin-top: 25px;
+        }
+        .file-upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            margin-bottom: 20px;
+        }
+        .file-upload-area:hover, .file-upload-area.dragover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .file-upload-area input {
+            display: none;
+        }
+        .file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: #e3f2fd;
+            border-radius: 25px;
+            font-size: 14px;
+        }
+        .file-item img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 12px;
+        }
+        .remove-file {
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            margin-left: 12px;
+            cursor: pointer;
+        }
+        .preview-header {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .preview-answer {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            min-height: 400px;
+        }
+        .preview-teacher {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e3f2fd;
+        }
+        .teacher-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .char-count {
+            text-align: right;
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            .editor-section {
+                border-right: none;
+                border-bottom: 1px solid #e1e5e9;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>✍️ Compose Answer</h1>
+                <p style="opacity: 0.9;">Respond to student doubt #123</p>
+            </div>
+            <div>
+                <button class="back-btn" onclick="history.back()">← Back to Queue</button>
+                <button class="publish-btn" id="publishBtn" disabled>🚀 Publish Answer</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="editor-section">
+                <!-- Student Question -->
+                <div class="question-card">
+                    <div class="question-title">Quantum Superposition - Real Experiment Confusion</div>
+                    <div class="question-meta">
+                        <span>👤 Aryan K. (STU2025001256)</span>
+                        <span>📚 DS</span>
+                        <span>📅 Submitted 2 hours ago</span>
+                        <span>🔴 High Priority</span>
+                    </div>
+                    <div class="question-text">
+                        How does quantum superposition work in actual experiments? The textbook explanation talks about wave function collapse, 
+                        but online videos show different results. I'm confused about the measurement problem and when superposition actually breaks.
+                    </div>
+                </div>
+
+                <!-- Editor Toolbar -->
+                <div class="toolbar">
+                    <button class="toolbar-btn active" onclick="formatText('bold')">𝐁</button>
+                    <button class="toolbar-btn" onclick="formatText('italic')">𝑖</button>
+                    <button class="toolbar-btn" onclick="formatText('underline')">U</button>
+                    <button class="toolbar-btn" onclick="formatText('h2')">H2</button>
+                    <button class="toolbar-btn" onclick="formatText('h3')">H3</button>
+                    <button class="toolbar-btn" onclick="insertLink()">🔗 Link</button>
+                    <button class="toolbar-btn" onclick="insertCode()">💻 Code</button>
+                    <button class="toolbar-btn" onclick="insertMath()">📐 Math</button>
+                    <button class="toolbar-btn" onclick="insertList()">• List</button>
+                </div>
+
+                <!-- Rich Text Editor -->
+                <textarea class="editor" id="editor" placeholder="Write your detailed answer here... Explain concepts clearly, use examples, and address the student's specific confusion."></textarea>
+                <div class="char-count">0/5000 characters</div>
+
+                <!-- File Attachments -->
+                <div class="attachments-section">
+                    <label class="file-upload-area" id="fileUploadArea">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📎</div>
+                        <strong>Attach Images, PDFs, or Diagrams</strong>
+                        <p style="color: #666; margin-top: 5px;">Drag & drop or click to browse (Max 10MB)</p>
+                        <input type="file" id="fileInput" multiple accept="image/*,.pdf,.docx">
+                    </label>
+                    <div class="file-list" id="fileList"></div>
+                </div>
+            </div>
+
+            <!-- Live Preview -->
+            <div class="preview-section">
+                <div class="preview-header">📱 Live Preview</div>
+                <div class="preview-answer" id="preview">
+                    <div class="preview-teacher">
+                        <div class="teacher-avatar">RS</div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 2px;">Prof. Raman Sharma</div>
+                            <div style="color: #666; font-size: 14px;">Physics Department Head</div>
+                        </div>
+                    </div>
+                    <div id="previewContent">
+                        Your answer will appear here in real-time as you type...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const previewContent = document.getElementById('previewContent');
+        const publishBtn = document.getElementById('publishBtn');
+        const fileInput = document.getElementById('fileInput');
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const fileList = document.getElementById('fileList');
+        
+        let files = [];
+        let isFormatting = false;
+
+        // Real-time preview and character count
+        editor.addEventListener('input', updatePreview);
+        editor.addEventListener('keyup', updatePreview);
+
+        function updatePreview() {
+            const content = editor.value || 'Your answer will appear here in real-time as you type...';
+            previewContent.innerHTML = content
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code style="background: #f1f3f4; padding: 2px 6px; border-radius: 4px;">$1</code>');
+            
+            const charCount = editor.value.length;
+            document.querySelector('.char-count').textContent = `${charCount}/5000 characters`;
+            
+            publishBtn.disabled = charCount < 50 || charCount > 5000;
+        }
+
+        // Rich text formatting
+        function formatText(type) {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const selectedText = editor.value.substring(start, end);
+            
+            let formattedText = '';
+            switch(type) {
+                case 'bold': formattedText = `**${selectedText}**`; break;
+                case 'italic': formattedText = `*${selectedText}*`; break;
+                case 'underline': formattedText = `<u>${selectedText}</u>`; break;
+                case 'h2': formattedText = `## ${selectedText}`; break;
+                case 'h3': formattedText = `### ${selectedText}`; break;
+                case 'code': formattedText = `\`${selectedText}\``; break;
+                case 'list': 
+                    const lines = selectedText.split('\n');
+                    formattedText = lines.map(line => `• ${line}`).join('\n');
+                    break;
+            }
+            
+            editor.value = editor.value.substring(0, start) + formattedText + editor.value.substring(end);
+            editor.focus();
+            editor.setSelectionRange(start + 2, start + 2 + selectedText.length);
+            updatePreview();
+        }
+
+        function insertLink() {
+            const url = prompt('Enter URL:');
+            if (url) {
+                const start = editor.selectionStart;
+                const text = editor.value.substring(start, editor.selectionEnd) || 'Link';
+                const link = `[${text}](${url})`;
+                editor.value = editor.value.substring(0, start) + link + editor.value.substring(editor.selectionEnd);
+                updatePreview();
+            }
+        }
+
+        function insertCode() {
+            const code = prompt('Enter code snippet:');
+            if (code) {
+                const formatted = `\n\`\`\`\n${code}\n\`\`\`\n`;
+                const pos = editor.selectionStart;
+                editor.value = editor.value.substring(0, pos) + formatted + editor.value.substring(pos);
+                updatePreview();
+            }
+        }
+
+        function insertMath() {
+            const formula = prompt('Enter math formula (LaTeX):');
+            if (formula) {
+                const math = `$$${formula}$$`;
+                const pos = editor.selectionStart;
+                editor.value = editor.value.substring(0, pos) + math + editor.value.substring(pos);
+                updatePreview();
+            }
+        }
+
+        // File upload handling
+        fileUploadArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFiles);
+
+        ['dragover', 'dragenter'].forEach(event => {
+            fileUploadArea.addEventListener(event, (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(event => {
+            fileUploadArea.addEventListener(event, (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('dragover');
+                if (event === 'drop') {
+                    handleFiles({ target: { files: e.dataTransfer.files } });
+                }
+            });
+        });
+
+        function handleFiles(e) {
+            const newFiles = Array.from(e.target.files);
+            newFiles.forEach(file => {
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File too large! Max 10MB');
+                    return;
+                }
+                if (files.length < 5) {
+                    files.push(file);
+                }
+            });
+            renderFileList();
+        }
+
+        function renderFileList() {
+            fileList.innerHTML = '';
+            files.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                if (file.type.startsWith('image/')) {
+                    const imgUrl = URL.createObjectURL(file);
+                    fileItem.innerHTML = `
+                        <img src="${imgUrl}" alt="${file.name}">
+                        <span>${file.name} (${(file.size/1024).toFixed(1)}KB)</span>
+                        <button class="remove-file" onclick="removeFile(${index})">×</button>
+                    `;
+                } else {
+                    fileItem.innerHTML = `
+                        <div style="width:40px;height:40px;background:#e3f2fd;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-right:12px;font-size:20px;">📄</div>
+                        <span>${file.name} (${(file.size/1024).toFixed(1)}KB)</span>
+                        <button class="remove-file" onclick="removeFile(${index})">×</button>
+                    `;
+                }
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function removeFile(index) {
+            files.splice(index, 1);
+            renderFileList();
+        }
+
+        // Publish handler
+        publishBtn.addEventListener('click', () => {
+            publishBtn.disabled = true;
+            publishBtn.textContent = 'Publishing...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                alert('✅ Answer published successfully!\n\nStudent notified and doubt marked as answered.');
+                history.back();
+            }, 1500);
+        });
+
+        // Initial update
+        updatePreview();
+    </script>
+</body>
+</html>

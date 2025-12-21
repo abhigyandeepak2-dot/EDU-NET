@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial; margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); color: #333; padding: 20px; }
+        .header { background: white; padding: 20px; text-align: center; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-bottom: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .notification { background: #fff3cd; padding: 15px; border-radius: 5px; margin: 10px 0; border-left: 5px solid #667eea; }
+        .notification.unread { background: #d4edda; }
+        .mark-read { float: right; background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        .no-notifications { text-align: center; padding: 50px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-bell"></i> Notifications</h1>
+        <p>All your notifications in one place.</p>
+    </div>
+    <div class="container">
+        <div id="notifications-list"></div>
+    </div>
+    <script>
+        let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+
+        function displayNotifications() {
+            const list = document.getElementById('notifications-list');
+            if (notifications.length === 0) {
+                list.innerHTML = '<div class="no-notifications">No notifications yet.</div>';
+                return;
+            }
+            list.innerHTML = notifications.map((n, index) => `
+                <div class="notification ${n.read ? '' : 'unread'}">
+                    <h4>${n.title} (${n.type})</h4>
+                    <p>${n.message}</p>
+                    ${!n.read ? `<button class="mark-read" onclick="markAsRead(${index})">Mark Read</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function markAsRead(index) {
+            notifications[index].read = true;
+            localStorage.setItem('notifications', JSON.stringify(notifications));
+            displayNotifications();
+        }
+
+        displayNotifications();
+    </script>
+</body>
+</html>

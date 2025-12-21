@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Availability Checker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .teacher {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .green { background-color: green; }
+        .yellow { background-color: orange; }
+        .red { background-color: red; }
+
+        .legend {
+            margin-top: 25px;
+        }
+
+        .legend div {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .legend span {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1><i class="fas fa-user-check"></i> Teacher Availability Checker</h1>
+    <p>Students can see teacher availability in real-time</p>
+</div>
+
+<div class="container">
+
+    <div id="teachers-list"></div>
+
+    <div class="legend">
+        <h3>Status Meaning</h3>
+        <div><div class="status green"></div><span>Green: Teacher is free</span></div>
+        <div><div class="status yellow"></div><span>Yellow: Busy soon</span></div>
+        <div><div class="status red"></div><span>Red: In class / Unavailable</span></div>
+    </div>
+
+</div>
+
+<script>
+    // Teacher schedule data
+    let teachers = [
+        { name: "Ms. Rishu Jain", schedules: [{ time: "10:00" }] },
+        { name: "Mr. Amol Sharma", schedules: [{ time: "11:00" }] },
+        { name: "Mr. Sandeep Tyagi", schedules: [{ time: "12:30" }] }
+    ];
+
+    function checkAvailability() {
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        const list = document.getElementById("teachers-list");
+
+        list.innerHTML = teachers.map(teacher => {
+            let status = "green"; // Default → Available
+
+            teacher.schedules.forEach(schedule => {
+                const [hour, minute] = schedule.time.split(":").map(Number);
+                const startTime = hour * 60 + minute;
+                const endTime = startTime + 60; // 1 hour class
+
+                if (currentMinutes >= startTime && currentMinutes <= endTime) {
+                    status = "red"; // In class
+                }
+                else if (
+                    currentMinutes < startTime &&
+                    (startTime - currentMinutes) <= 30
+                ) {
+                    status = "yellow"; // Busy soon
+                }
+            });
+
+            return `
+                <div class="teacher">
+                    <div class="status ${status}"></div>
+                    <strong>${teacher.name}</strong>
+                </div>
+            `;
+        }).join("");
+    }
+
+    checkAvailability();
+    setInterval(checkAvailability, 60000); // Update every minute
+</script>
+
+</body>
+</html>

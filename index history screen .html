@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Session History</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 32px auto;
+      padding: 0 16px 24px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
+
+    .subtitle {
+      margin: 0 0 16px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 180px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 8px 10px 8px 28px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .search-box span {
+      position: absolute;
+      left: 9px;
+      top: 7px;
+      font-size: 14px;
+      color: #9ca3af;
+    }
+
+    select {
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .chip {
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background: #111827;
+      color: #f9fafb;
+      border-color: #111827;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .history-table thead {
+      background: #f9fafb;
+    }
+
+    .history-table th,
+    .history-table td {
+      padding: 10px 12px;
+      font-size: 13px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .history-table th {
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    .history-table tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    .status-pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    .status-completed {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-missed {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .status-cancelled {
+      background: #e5e7eb;
+      color: #4b5563;
+    }
+
+    .tag-pill {
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 11px;
+      display: inline-block;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-outline,
+    .btn-primary {
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: transparent;
+    }
+
+    .btn-outline {
+      border-color: #d1d5db;
+      color: #374151;
+      background: #ffffff;
+    }
+
+    .btn-outline:hover {
+      background: #f3f4f6;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #1d4ed8;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .empty-state {
+      padding: 18px;
+      font-size: 13px;
+      color: #6b7280;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .history-table thead {
+        display: none;
+      }
+      .history-table,
+      .history-table tbody,
+      .history-table tr,
+      .history-table td {
+        display: block;
+        width: 100%;
+      }
+      .history-table tr {
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .history-table td {
+        border: none;
+        padding: 6px 12px;
+      }
+      .history-table td::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #9ca3af;
+        margin-bottom: 1px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Session history</h1>
+    <p class="subtitle">
+      View all your past one‑to‑one sessions, watch recordings, or quickly re‑request the same teacher.
+    </p>
+
+    <!-- Filters / search -->
+    <div class="toolbar">
+      <div class="search-box">
+        <span>🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by teacher, subject, or note…"
+        />
+      </div>
+
+      <select id="subjectFilter">
+        <option value="">All subjects</option>
+        <option>Energy science</option>
+        <option>Data structure</option>
+        <option>Cyber security</option>
+        <option>UHVP</option>
+      </select>
+
+      <button class="chip active" data-status="">
+        All
+      </button>
+      <button class="chip" data-status="Completed">
+        Completed
+      </button>
+      <button class="chip" data-status="Missed">
+        Missed
+      </button>
+      <button class="chip" data-status="Cancelled">
+        Cancelled
+      </button>
+    </div>
+
+    <!-- Table -->
+    <table class="history-table" id="historyTable">
+      <thead>
+        <tr>
+          <th>Date & time</th>
+          <th>Teacher / subject</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody">
+        <!-- rows will be injected by JS -->
+      </tbody>
+    </table>
+    <div id="emptyState" class="empty-state" style="display:none;">
+      No sessions match your filters. Try adjusting the search or status.
+    </div>
+  </div>
+
+  <script>
+    // Example data; in a real app this would come from backend / database
+    const sessions = [
+      {
+        id: 1,
+        date: "20 Dec 2025",
+        time: "3:30 PM – 4:00 PM",
+        teacher: "Mr. Sandeep Tyagi",
+        subject: "Energy science",
+        note: "Fission&Fussion",
+        status: "Completed",
+        hasRecording: true
+      },
+      {
+        id: 2,
+        date: "18 Dec 2025",
+        time: "5:00 PM – 5:30 PM",
+        teacher: "Ms. Lekhika Prakash",
+        subject: "UHVP",
+        note: "Human Valu ",
+        status: "Missed",
+        hasRecording: false
+      },
+      {
+        id: 3,
+        date: "15 Dec 2025",
+        time: "6:00 PM – 6:45 PM",
+        teacher: "Dr. Praveen kumar",
+        subject: "OS",
+        note: "Multi-programming",
+        status: "Completed",
+        hasRecording: true
+      },
+      {
+        id: 4,
+        date: "10 Dec 2025",
+        time: "7:00 PM – 7:30 PM",
+        teacher: "Mr. Sandeep Tyagi",
+        subject: "Energy Science",
+        note: "PWD",
+        status: "Cancelled",
+        hasRecording: false
+      }
+    ];
+
+    const historyBody = document.getElementById("historyBody");
+    const searchInput = document.getElementById("searchInput");
+    const subjectFilter = document.getElementById("subjectFilter");
+    const chips = document.querySelectorAll(".chip");
+    const emptyState = document.getElementById("emptyState");
+
+    let statusFilter = "";
+
+    function renderTable() {
+      const term = searchInput.value.trim().toLowerCase();
+      const subject = subjectFilter.value;
+      historyBody.innerHTML = "";
+
+      const filtered = sessions.filter((s) => {
+        const matchesStatus = !statusFilter || s.status === statusFilter;
+        const matchesSubject = !subject || s.subject === subject;
+        const matchesSearch =
+          !term ||
+          s.teacher.toLowerCase().includes(term) ||
+          s.subject.toLowerCase().includes(term) ||
+          s.note.toLowerCase().includes(term);
+
+        return matchesStatus && matchesSubject && matchesSearch;
+      });
+
+      if (!filtered.length) {
+        emptyState.style.display = "block";
+        return;
+      }
+      emptyState.style.display = "none";
+
+      filtered.forEach((s) => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td data-label="Date & time">
+            <div>${s.date}</div>
+            <div style="font-size:12px;color:#6b7280;">${s.time}</div>
+          </td>
+          <td data-label="Teacher / subject">
+            <div style="font-weight:500;">${s.teacher}</div>
+            <div style="font-size:12px;color:#6b7280;">
+              <span class="tag-pill">${s.subject}</span>
+              &nbsp;· ${s.note}
+            </div>
+          </td>
+          <td data-label="Status">
+            <span class="status-pill ${statusClass(s.status)}">
+              ${s.status}
+            </span>
+          </td>
+          <td data-label="Actions">
+            <div class="actions">
+              ${
+                s.hasRecording
+                  ? `<button class="btn-outline" onclick="viewRecording(${s.id})">View recording</button>`
+                  : ""
+              }
+              <button class="btn-primary" onclick="reRequest(${s.id})">
+                Re‑request
+              </button>
+            </div>
+          </td>
+        `;
+        historyBody.appendChild(tr);
+      });
+    }
+
+    function statusClass(status) {
+      if (status === "Completed") return "status-completed";
+      if (status === "Missed") return "status-missed";
+      if (status === "Cancelled") return "status-cancelled";
+      return "";
+    }
+
+    // Handlers
+    searchInput.addEventListener("input", renderTable);
+    subjectFilter.addEventListener("change", renderTable);
+
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        chips.forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        statusFilter = chip.getAttribute("data-status") || "";
+        renderTable();
+      });
+    });
+
+    // Dummy actions
+    window.viewRecording = function (id) {
+      const s = sessions.find((x) => x.id === id);
+      alert(`Open recording page for: ${s.teacher} · ${s.subject}`);
+      // Example: window.location.href = `/recording.html?sessionId=${id}`;
+    };
+
+    window.reRequest = function (id) {
+      const s = sessions.find((x) => x.id === id);
+      alert(`Create new request with ${s.teacher} for ${s.subject}.`);
+      // Example: redirect to booking form with pre‑filled data
+      // window.location.href = `/request.html?teacher=${encodeURIComponent(s.teacher)}&subject=${encodeURIComponent(s.subject)}`;
+    };
+
+    // Initial render
+    renderTable();
+  </script>
+</body>
+</html>
