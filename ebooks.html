@@ -161,7 +161,7 @@
         .book-cover {
             width: 100%;
             height: 280px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f0f2f6 0%, #161515 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -300,6 +300,10 @@
         <div class="header-content">
             <h1>📚 Edu-Net E-Books Library</h1>
             <p>Browse and read our complete collection of educational books</p>
+            <a href="features/read-or-download.html" style="color:white; text-decoration:underline;">
+    Go to Read / Download
+</a>
+
         </div>
     </div>
 
@@ -354,12 +358,15 @@
                 cover: 'https://media.springernature.com/w316/springer-static/cover-hires/book/978-3-662-57970-1?as=webp'
             },
             {
+            
+                
                 id: 4,
                 title: 'Hands-On Generative AI with Transformers and Diffusion Models',
                 author: 'Omar Sanseviero',
                 rating: '4.8★',
                 category: 'programming',
                 cover: 'https://m.media-amazon.com/images/I/71ycW-J-8OL._SY385_.jpg'
+             
             },
             {
                 id: 5,
@@ -428,50 +435,69 @@
         ];
 
         let currentFilter = 'all';
+    function renderBooks(bookList = books) {
+    const grid = document.getElementById('booksGrid');
 
-        function renderBooks(bookList = books) {
-            const grid = document.getElementById('booksGrid');
-            
-            if (bookList.length === 0) {
-                grid.innerHTML = `
-                    <div style="grid-column: 1/-1;">
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📭</div>
-                            <h3>No books found</h3>
-                            <p>Try adjusting your search or filter criteria</p>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = bookList.map(book => `
-                <div class="book-card">
-                    <div class="book-cover">
-                        <img src="${book.cover}" alt="${book.title}" onerror="this.src='https://via.placeholder.com/220x280/667eea/ffffff?text=${encodeURIComponent(book.title)}'">
-                    </div>
-                    <div class="book-info">
-                        <div class="book-title">${book.title}</div>
-                        <div class="book-author">by ${book.author}</div>
-                        <div class="book-rating">${book.rating}</div>
-                        <div class="book-actions">
-                            <button class="btn-small btn-read" onclick="openReader('${book.title}')">Read Now</button>
-                            <button class="btn-small btn-bookmark" onclick="addBookmark('${book.title}')">🔖</button>
-                        </div>
-                        <button class="btn-small btn-download" onclick="downloadBook('${book.title}')" style="margin-top: 8px;">⬇️ Download</button>
-                    </div>
+    if (bookList.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1/-1;">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <h3>No books found</h3>
+                    <p>Try adjusting your search or filter criteria</p>
                 </div>
-            `).join('');
-        }
+            </div>
+        `;
+        return;
+    }
 
+    grid.innerHTML = bookList.map(book => {
+        return `
+            <div class="book-card" onclick="goToReadPage(${book.id})">
+                <div class="book-cover">
+                    <img src="${book.cover}" alt="${book.title}">
+                </div>
+                <div class="book-info">
+                    <div class="book-title">${book.title}</div>
+                    <div class="book-author">by ${book.author}</div>
+                    <div class="book-rating">${book.rating}</div>
+                    <div class="book-actions">
+                        <button class="btn-small btn-read"
+                            onclick="event.stopPropagation(); openReader('${book.title}')">
+                            Read Now
+                        </button>
+                        <button class="btn-small btn-bookmark"
+                            onclick="event.stopPropagation(); addBookmark('${book.title}')">
+                            🔖
+                        </button>
+                    </div>
+                    <button class="btn-small btn-download"
+                        onclick="event.stopPropagation(); downloadBook('${book.title}')"
+                        style="margin-top: 8px;">
+                        ⬇️ Download
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+
+
+        
+        
         function filterBooks(category) {
-            currentFilter = category;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            const filtered = category === 'all' ? books : books.filter(b => b.category === category);
-            renderBooks(filtered);
-        }
+    currentFilter = category;
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.activeElement.classList.add('active');
+
+    const filtered = category === 'all' ? books : books.filter(b => b.category === category);
+    renderBooks(filtered);
+}
+
+         
+
+        
 
         function searchBooks() {
             const query = document.getElementById('searchInput').value.toLowerCase();
@@ -502,6 +528,13 @@
                 }
             });
         });
+
+        function goToReadPage(bookId) {
+    if (bookId === 4) {
+         window.location.href = "features/read-or-download.html";
+    }
+}
+
 
         // Initialize
         renderBooks();
