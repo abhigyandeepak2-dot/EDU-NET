@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edu-Net | Connect, Learn and Grow</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO -->
+    <meta name="description" content="Edu-Net is a modern educational platform connecting students and teachers with smart scheduling, messaging, and learning tools.">
+    <meta name="keywords" content="Education Platform, Student Teacher Communication, Edu-Net">
+    <meta name="author" content="Edu-Net Team">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=smart_toy" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            background: #f0fbfd;
+            color: #1f2937;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* ---------- Navbar ---------- */
+        header {
+            background: #f0fbfd;
+            border-bottom: 1px solid #e5e8eb;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: auto;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            color: #8f25eb;
+        }
+
+        .nav-links a {
+            margin-left: 20px;
+            font-size: 15px;
+            color: #374151;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+
+        .signup-btn {
+            background: #767ef5;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .signup-btn:hover {
+            background: #4f46e5;
+        }
+
+        /* ---------- Hero Section ---------- */
+        .hero {
+            background: linear-gradient(to bottom, #0056b3, #f0fbfd);
+            padding: 80px 20px;
+        }
+
+        .hero-content {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .hero span {
+            color: #8f25eb;
+        }
+
+        .hero p {
+            max-width: 600px;
+            font-size: 16px;
+            color: #4b5563;
+        }
+
+        /* ---------- Why Edu-Net ---------- */
+        .why {
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .why h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .why p {
+            color: #6b7280;
+            margin-bottom: 40px;
+        }
+
+        .why-cards {
+            max-width: 1100px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            padding: 25px;
+            border-radius: 12px;
+            text-align: left;
+        }
+
+        .problem { background: #faf8f8; }
+        .solution { background: #f0fdf4; }
+        .impact { background: #eff6ff; }
+
+        .card h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .card ul li {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        /* ---------- Features ---------- */
+        .features {
+            padding: 80px 20px;
+            background: linear-gradient(to right #46e2e5,#ffffff);
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: 32px;
+        }
+
+        .features p {
+            color: #6b7280;
+            margin: 10px 0 40px;
+        }
+
+        .feature-grid {
+            max-width: 1100px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .feature-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 14px;
+            text-align: left;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 30px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            font-size: 34px;
+            color: #2563eb;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h4 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .view-btn {
+            margin-top: 40px;
+            display: inline-block;
+            padding: 12px 22px;
+            background: #8f25eb;
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        /* ---------- Stats & CTA ---------- */
+        .cta {
+            background: linear-gradient(to right, #ab54cd,#34495E);
+            color: #fff;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat h3 {
+            font-size: 36px;
+        }
+
+        .stat p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .cta h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .cta p {
+            max-width: 600px;
+            margin: auto;
+            opacity: 0.9;
+        }
+
+        .cta-buttons {
+            margin-top: 30px;
+        }
+
+        .cta-buttons a {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .primary {
+            background: #fff;
+            color: #8f25eb;
+        }
+
+        .primary:hover {
+            background: #e0e7ff;
+        }
+
+        .secondary {
+            border: 1px solid #fff;
+        }
+
+        .secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* ---------- Footer ---------- */
+        footer {
+            background: #230f2a;
+            color: #cbd5f5;
+            padding: 60px 20px 20px;
+        }
+
+        .footer-grid {
+            max-width: 1100px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 30px;
+        }
+
+        footer h4 {
+            margin-bottom: 15px;
+        }
+
+        footer a {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #cbd5f5;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        /* ---------- Mobile ---------- */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .cta h2 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="navbar">
+        <div class="logo">🎓 Edu-Net</div>
+       <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="#features">Features</a>
+    <a href="features/ebooks.html">E-Books</a>
+    <a href="features/chatbot.html">Chatbot</a>
+    <a href="features/scheduling.html">Scheduling</a>
+    <a href="features/notes gallery.html">Notes gallery</a>
+    <a href="features/one-to-one session.html">One-to-one interaction</a>
+    <a href="features/answers.html">Messages</a>
+    <a href="features/signup.html">Sign up / Login</a>
+
+    </nav>
+        </nav>
+        </div>
+    
+</header>
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>Connect, Learn, and<br>Grow with <span>Edu-Net</span></h1>
+        <p>
+            A specialized platform connecting students and teachers without
+            interrupting their personal lives. Share schedules, access resources,
+            and collaborate seamlessly.
+        </p>
+    </div>
+</section>
+
+<section class="why">
+    <h2> Edu-Net</h2>
+    <p>Traditional messaging apps create chaos with multiple groups, endless notifications, and no separation between academic and personal life.</p>
+
+    <div class="why-cards">
+        <div class="card problem">
+            <h3>The Problem</h3>
+            <ul>
+                <li>Students struggle to reach teachers</li>
+                <li>WhatsApp groups are messy</li>
+                <li>No separation of personal & academic life</li>
+            </ul>
+        </div>
+
+        <div class="card solution">
+            <h3>Our Solution</h3>
+            <ul>
+                <li>Dedicated academic platform</li>
+                <li>Organized schedules & announcements</li>
+                <li>Clear separation of communication</li>
+            </ul>
+        </div>
+
+        <div class="card impact">
+            <h3>The Impact</h3>
+            <ul>
+                <li>Better communication</li>
+                <li>Improved performance</li>
+                <li>Enhanced learning experience</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="features" id="features">
+
+    <h2>Powerful Features for Modern Education</h2>
+    <p>Everything you need in one platform</p>
+
+    <div class="feature-grid">
+    <a href="features/scheduling.html" class="feature-card">
+    <div class="feature-icon">📅</div>
+    <h4>Smart Scheduling</h4>
+    <p>Teachers post schedules, students get notifications.</p>
+    </a>
+
+        
+
+       <a href="features/ebooks.html" class="feature-card">
+    <div class="feature-icon">📘</div>
+    <h4>E-Books Library</h4>
+    <p>Access syllabus and technical books anytime.</p>
+    </a>
+
+
+        <a href="features/notes gallery.html" class="feature-card">
+    <div class="feature-icon">👥</div>
+    <h4>Notes Gallery</h4>
+    <p>Track marks, attendance and instant tests.</p>
+    </a>
+
+
+        <a href="features/one-to-one session.html" class="feature-card">
+    <div class="feature-icon">🎥</div>
+    <h4>One-to-one Interaction</h4>
+    <p>Live doubt sessions and consultations.</p>
+    </a>
+
+     <a href="features/chatbot.html" class="feature-card">
+    <div class="feature-icon">🤖</div>
+    <h4>Edu-Bot</h4>
+    <p>Ask query and consultations.</p>
+    </a>
+        
+
+        <a href="features/answers.html" class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h4>Answer view page</h4>
+            <p>Get all your answers from teachers directly.</p>
+        </a>
+
+    </div>
+    <a href="#" class="view-btn">View All Features</a>
+    <span class="material-symbols-outlined">smart_toy</span>
+</section>
+
+<section class="cta">
+    <div class="stats">
+        <div class="stat">
+            <h3>10,000+</h3>
+            <p>Active Students</p>
+        </div>
+        <div class="stat">
+            <h3>500+</h3>
+            <p>Verified Teachers</p>
+        </div>
+        <div class="stat">
+            <h3>50+</h3>
+            <p>Institutions</p>
+        </div>
+    </div>
+
+    <h2>Ready to Transform Your Educational Experience?</h2>
+    <p>✓ Free to start • ✓ No credit card required • ✓ Institutional verification</p>
+
+    <div class="cta-buttons">
+        <a href="#" class="primary">Get Started Today →</a>
+        <a href="#" class="secondary">Learn More</a>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-grid">
+        <div>
+            <h4>🎓 Edu-Net</h4>
+            <p>Connecting students and teachers for a better educational experience.</p>
+        </div>
+
+        <div>
+            <h4>Quick Links</h4>
+            <a href="#">Home</a>
+            <a href="#">Features</a>
+            <a href="#">About</a>
+        </div>
+
+        <div>
+            <h4>Features</h4>
+            <a href="features/scheduling.html">Smart Scheduling</a>
+            <a href="features/ebooks.html">E-Books</a>
+            <a href="features/one-to-one session.html">Live Sessions</a>
+            <a href="features/notes gallery.html">Notes gallery</a>
+        </div>
+
+        <div>
+            <h4>Contact</h4>
+            <a href="#">support@edunet.com</a>
+            <a href="#">+1 234 567 8900</a>
+            <a href="#">Meeerut City, India</a>
+        </div>
+    </div>
+
+    <div class="copyright">
+        © 2026 Edu-Net. All rights reserved.
+    </div>
+</footer>
+
+</body>
+</html>
