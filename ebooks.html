@@ -38,10 +38,28 @@
             margin-bottom: 30px;
         }
 
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+       .header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+        }
+
+        .nav-links a {
+    text-decoration: none;
+    background: #1a6485;
+    color: #ffffff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: 0.3s ease;
+        }
+
+.nav-links a:hover {
+    background: #e6f0ff;
         }
 
         .header h1 {
@@ -273,6 +291,7 @@
             color: var(--text);
             margin-bottom: 8px;
         }
+        
 
         @media (max-width: 768px) {
             .books-grid {
@@ -292,19 +311,21 @@
                 font-size: 13px;
                 min-height: 30px;
             }
+  
         }
     </style>
+
 </head>
 <body>
     <div class="header">
         <div class="header-content">
             <h1>📚 Edu-Net E-Books Library</h1>
             <p>Browse and read our complete collection of educational books</p>
-            <a href="features/read-or-download.html" style="color:white; text-decoration:underline;">
-    Go to Read / Download
-</a>
-
-        </div>
+             
+     <nav class="nav-links">
+     <a href="features/upload.ebooks.html">Upload</a>  
+     </nav>   
+    </div>
     </div>
 
     <div class="container">
