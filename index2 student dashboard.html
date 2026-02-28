@@ -5,94 +5,366 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Student Dashboard</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
 body{
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg,#667eea,#764ba2);
-    padding: 30px;
+background:#f3f6fb;
+color:#1f2937;
 }
 
-.container{
-    max-width: 900px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+.wrapper{
+display:flex;
+min-height:100vh;
 }
 
-h2,h3{
-    text-align: center;
+/* SIDEBAR */
+.sidebar{
+width:240px;
+background:#111827;
+color:#cbd5e1;
+padding:25px 20px;
 }
 
-select{
-    width: 100%;
-    padding: 10px;
-    margin: 15px 0;
+.sidebar h3{
+color:white;
+margin-bottom:30px;
+}
+
+.sidebar div{
+padding:10px 12px;
+border-radius:6px;
+margin-bottom:6px;
+cursor:pointer;
+}
+
+.sidebar div:hover{
+background:#1f2937;
+color:white;
+}
+
+/* MAIN */
+.main{
+flex:1;
+padding:35px;
+}
+
+/* TOPBAR */
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.topbar h2{
+font-size:22px;
+}
+
+.btn{
+padding:8px 14px;
+border-radius:6px;
+border:1px solid #d1d5db;
+background:white;
+cursor:pointer;
+font-size:13px;
+}
+
+.btn:hover{
+background:#f3f4f6;
+}
+
+/* WELCOME */
+.welcome{
+background:white;
+border-radius:10px;
+border:1px solid #e5e7eb;
+padding:18px;
+margin-bottom:25px;
+}
+
+/* SUMMARY */
+.summary{
+display:flex;
+gap:20px;
+margin-bottom:30px;
+}
+
+.card-small{
+flex:1;
+background:white;
+padding:18px;
+border-radius:10px;
+border:1px solid #e5e7eb;
+}
+
+.card-small h4{
+font-size:14px;
+color:#6b7280;
+}
+
+.card-small span{
+display:block;
+font-size:22px;
+font-weight:600;
+margin-top:5px;
+}
+
+/* QUICK ACTIONS */
+.quick-actions{
+display:flex;
+gap:15px;
+margin-bottom:30px;
+}
+
+.quick-card{
+flex:1;
+background:white;
+padding:15px;
+border-radius:10px;
+border:1px solid #e5e7eb;
+text-align:center;
+cursor:pointer;
+transition:0.2s;
+}
+
+.quick-card:hover{
+background:#f9fafb;
+}
+
+/* FILTER */
+.filter-box{
+margin-bottom:20px;
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+/* NOTES */
+.card{
+background:white;
+border-radius:10px;
+border:1px solid #e5e7eb;
+padding:20px;
 }
 
 .note{
-    background: #f2f2f2;
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 5px;
-    font-size: 14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px;
+border-radius:6px;
+border:1px solid #e5e7eb;
+margin-bottom:10px;
 }
 
-.empty{
-    text-align: center;
-    color: #777;
-    margin-top: 20px;
+.note:hover{
+background:#f9fafb;
+}
+
+.note-left{
+display:flex;
+gap:8px;
+align-items:center;
+}
+
+.note-actions{
+display:flex;
+gap:6px;
+}
+
+/* ACTIVITY */
+.activity{
+margin-top:25px;
+background:white;
+border-radius:10px;
+border:1px solid #e5e7eb;
+padding:20px;
+}
+
+.activity-item{
+font-size:14px;
+margin-bottom:8px;
+color:#4b5563;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="wrapper">
 
-    <h2>🎓 Student Dashboard</h2>
+<div class="sidebar">
+<h3>📘 EduPanel</h3>
+<div>🏠 Dashboard</div>
+<a href="features/notesfolder.html" style="text-decoration:none; color:inherit;"><div>📚 My Notes</div></a>
+<a href="features/cloudnotes.html" style="text-decoration:none; color:inherit;"><div>☁ Cloud</div></a>
+<a href="features/notification.notes.html" style="text-decoration: none; color:inherit;"><div>🔔 Notifications</div></a>
+</div>
 
-    <h3>Select Subject</h3>
-    <select id="subjectSelect" onchange="filterNotes()">
-        <option value="">All Subjects</option>
-        <option>Computer Science</option>
-        <option>Mathematics</option>
-        <option>Physics</option>
-    </select>
+<div class="main">
 
-    <div id="notesList"></div>
+<div class="topbar">
+<h2>🎓 Student Dashboard</h2>
+<div class="topbar-buttons">
+<button class="btn">🔄 Refresh</button>
+<a href="teacherdashboard.html" style="text-decoration: none; color:inherit;" button class="btn">👩‍🏫 Teacher`s POV</button></a>
+</div>
+</div>
 
+<div class="welcome">
+<h3>Welcome Back 👋</h3>
+<p style="margin-top:5px;color:#6b7280;font-size:14px;">
+Access your study materials and manage your academic resources.
+</p>
+</div>
+
+<div class="summary">
+<div class="card-small">
+<h4>Total Notes</h4>
+<span id="totalNotes">10</span>
+</div>
+<div class="card-small">
+<h4>Subjects</h4>
+<span id="totalSubjects">6</span>
+</div>
+<div class="card-small">
+<h4>Recently Uploaded</h4>
+<span id="recentNote"> 📂Chapter 1 OOPJ.pdf</span>
+</div>
+</div>
+
+<div class="quick-actions">
+<a href="features/notesfolder.html" style="text-decoration:none; color:inherit;">
+    <div class="quick-card">📂 Browse All Notes</div>
+</a>
+<div class="quick-card">⬇ Download History</div>
+<div class="quick-card">⭐ Saved Notes</div>
+</div>
+
+<div class="filter-box">
+<label><strong>Subject:</strong></label>
+<select id="subjectSelect" onchange="filterNotes()">
+<option value="">All Subjects</option>
+<option>OOPJ</option>
+<option>Mathematics</option>
+<option>OS</option>
+<option>TAFL</option>
+<option>PYTHON</option>
+<option>TC</option>
+</select>
+</div>
+
+<div class="card">
+<div id="notesList"></div>
+</div>
+
+<div class="activity">
+<h3 style="margin-bottom:10px;">📈 Recent Activity</h3>
+<div id="activityList"></div>
+</div>
+
+</div>
 </div>
 
 <script>
 let notes = JSON.parse(localStorage.getItem("notes")) || [];
 
+function updateSummary(){
+document.getElementById("totalNotes").innerText = notes.length;
+
+let subjects = new Set(notes.map(n=>n.subject));
+document.getElementById("totalSubjects").innerText = subjects.size;
+
+if(notes.length>0){
+let last = notes[notes.length-1].file.split("\\\\").pop();
+document.getElementById("recentNote").innerText = last;
+}
+}
+
 function filterNotes(){
-    let subject = document.getElementById("subjectSelect").value;
-    let list = document.getElementById("notesList");
-    list.innerHTML = "";
+let subject = document.getElementById("subjectSelect").value;
+let list = document.getElementById("notesList");
+list.innerHTML = "";
 
-    let filtered = subject === "" 
-        ? notes 
-        : notes.filter(n => n.subject === subject);
+let filtered = subject === "" 
+? notes 
+: notes.filter(n => 
+    n.subject && 
+    n.subject.toLowerCase() === subject.toLowerCase()
+);
 
-    if(filtered.length === 0){
-        list.innerHTML = "<p class='empty'>No notes available.</p>";
-        return;
-    }
+/* IF NO REAL NOTES → SHOW DEFAULT CHAPTER 1 FILE */
+if(filtered.length === 0){
 
-    filtered.forEach(note=>{
-        let fileName = note.file.split("\\\\").pop();
-        list.innerHTML += `
-            <div class="note">
-                📄 ${note.subject} - ${fileName}
-            </div>
-        `;
-    });
+let defaultSubject = subject || "OOPJ";
+
+list.innerHTML = `
+<div class="note">
+<div class="note-left">
+📄 <strong>${defaultSubject}</strong> - Chapter 1 ${defaultSubject}.pdf
+</div>
+<div class="note-actions">
+<button class="btn">👁 View</button>
+<button class="btn">⬇ Download</button>
+</div>
+</div>
+`;
+
+return;
+}
+
+/* SHOW REAL NOTES */
+filtered.forEach(note=>{
+let fileName = note.file.split("\\\\").pop();
+list.innerHTML += `
+<div class="note">
+<div class="note-left">
+📄 <strong>${note.subject}</strong> - ${fileName}
+</div>
+<div class="note-actions">
+<button class="btn">👁 View</button>
+<button class="btn">⬇ Download</button>
+</div>
+</div>
+`;
+});
+}
+
+function loadActivity(){
+let activity = document.getElementById("activityList");
+activity.innerHTML = "";
+
+let recent = notes.slice(-5).reverse();
+
+if(recent.length === 0){
+activity.innerHTML = `
+<div class="activity-item">
+📄 Chapter 1 OOPJ.pdf uploaded in OOPJ
+</div>
+`;
+return;
+}
+
+recent.forEach(note=>{
+let fileName = note.file.split("\\\\").pop();
+activity.innerHTML += `
+<div class="activity-item">
+📄 ${fileName} uploaded in ${note.subject}
+</div>
+`;
+});
 }
 
 filterNotes();
+loadActivity();
 </script>
 
 </body>
