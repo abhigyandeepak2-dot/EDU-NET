@@ -5,135 +5,308 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Folder Organization</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
 body{
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg,#667eea,#764ba2);
-    padding: 30px;
+background:#f5f7fa;
+color:#1f2937;
 }
 
-.container{
-    max-width: 900px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+/* LAYOUT */
+.wrapper{
+display:flex;
+min-height:100vh;
 }
 
-h2{
-    text-align: center;
-    margin-bottom: 20px;
+/* SIDEBAR */
+.sidebar{
+width:240px;
+background:#111827;
+color:#cbd5e1;
+padding:25px 20px;
 }
 
+.sidebar h3{
+color:white;
+margin-bottom:30px;
+font-size:18px;
+}
+
+.sidebar div{
+padding:10px 12px;
+border-radius:6px;
+cursor:pointer;
+margin-bottom:6px;
+font-size:14px;
+}
+
+.sidebar div:hover{
+background:#1f2937;
+color:white;
+}
+
+/* MAIN */
+.main{
+flex:1;
+padding:35px;
+}
+
+/* TOPBAR */
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+.topbar h2{
+font-size:20px;
+font-weight:600;
+}
+
+.actions{
+display:flex;
+gap:10px;
+}
+
+/* BUTTONS */
+.btn{
+padding:8px 14px;
+border-radius:6px;
+border:1px solid #d1d5db;
+background:white;
+font-size:13px;
+cursor:pointer;
+transition:0.2s;
+display:flex;
+align-items:center;
+gap:6px;
+}
+
+.btn:hover{
+background:#f3f4f6;
+}
+
+.btn-primary{
+background:#2563eb;
+color:white;
+border:none;
+}
+
+.btn-primary:hover{
+background:#1e40af;
+}
+
+/* CARD */
+.card{
+background:white;
+border-radius:10px;
+padding:20px;
+border:1px solid #e5e7eb;
+}
+
+/* FOLDER TREE */
 .folder{
-    background: #f2f2f2;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-    cursor: pointer;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:10px 12px;
+border-radius:6px;
+cursor:pointer;
+font-size:14px;
+}
+
+.folder:hover{
+background:#f3f4f6;
+}
+
+.folder-left{
+display:flex;
+align-items:center;
+gap:8px;
+}
+
+.folder-actions{
+display:flex;
+gap:6px;
 }
 
 .sub{
-    margin-left: 20px;
-    margin-top: 5px;
+margin-left:25px;
 }
 
 .file{
-    background: #e8f0ff;
-    padding: 6px;
-    margin: 5px 0;
-    border-radius: 4px;
-    font-size: 14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:8px 12px;
+font-size:13px;
+color:#374151;
+border-radius:6px;
+}
+
+.file:hover{
+background:#f9fafb;
+}
+
+.file-left{
+display:flex;
+align-items:center;
+gap:6px;
+}
+
+.file-actions{
+display:flex;
+gap:6px;
 }
 
 .hidden{
-    display: none;
+display:none;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <h2>📁 Smart Folder Organization</h2>
-    <div id="folders"></div>
+<div class="wrapper">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+<h3>📘 EduPanel</h3>
+<div>🏠 Dashboard</div>
+<div>📤 Upload Notes</div>
+<div>📁 Smart Folders</div>
+<div>☁ Cloud</div>
+<div>🔔 Notifications</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<div class="topbar">
+<h2>📁 Smart Folder Organization</h2>
+<div class="actions">
+<button class="btn">🔄 Refresh</button>
+<button class="btn">🔍 Search</button>
+<button class="btn-primary">➕ New Folder</button>
+</div>
+</div>
+
+<div class="card">
+<div id="folders"></div>
+</div>
+
+</div>
 </div>
 
 <script>
-// Sample notes structure (from teacher uploads)
 let notes = JSON.parse(localStorage.getItem("notes")) || [
-    { subject:"Computer Science", year:"1st Year", unit:"Unit 1", file:"intro.pdf" },
-    { subject:"Computer Science", year:"1st Year", unit:"Unit 2", file:"arrays.pdf" },
-    { subject:"Mathematics", year:"2nd Year", unit:"Unit 1", file:"algebra.pdf" },
-    { subject:"Physics", year:"1st Year", unit:"Unit 3", file:"motion.pdf" }
+{ subject:"OOPJ", year:"2nd Year", unit:"Unit 1", file:"intro.pdf" },
+{ subject:"PYTHON", year:"2nd Year", unit:"Unit 2", file:"arrays.pdf" },
+{ subject:"OS", year:"2nd Year", unit:"Unit 1", file:"algebra.pdf" },
+{ subject:"TAFL", year:"2nd Year", unit:"Unit 3", file:"motion.pdf" }
 ];
 
-// Group notes
 function groupNotes(){
-    let structure = {};
-
-    notes.forEach(n=>{
-        structure[n.subject] ??= {};
-        structure[n.subject][n.year] ??= {};
-        structure[n.subject][n.year][n.unit] ??= [];
-        structure[n.subject][n.year][n.unit].push(n.file);
-    });
-
-    return structure;
+let structure = {};
+notes.forEach(n=>{
+structure[n.subject] ??= {};
+structure[n.subject][n.year] ??= {};
+structure[n.subject][n.year][n.unit] ??= [];
+structure[n.subject][n.year][n.unit].push(n.file);
+});
+return structure;
 }
 
 function renderFolders(){
-    let data = groupNotes();
-    let container = document.getElementById("folders");
-    container.innerHTML = "";
+let data = groupNotes();
+let container = document.getElementById("folders");
+container.innerHTML = "";
 
-    for(let subject in data){
-        let sDiv = document.createElement("div");
-        sDiv.className = "folder";
-        sDiv.innerText = "📂 " + subject;
-        sDiv.onclick = ()=> toggle(sDiv.nextSibling);
-        container.appendChild(sDiv);
+for(let subject in data){
 
-        let yearDiv = document.createElement("div");
-        yearDiv.className = "sub hidden";
+let sDiv = document.createElement("div");
+sDiv.className = "folder";
+sDiv.innerHTML = `
+<div class="folder-left">📂 <strong>${subject}</strong></div>
+<div class="folder-actions">
+<button class="btn">✏ Edit</button>
+<button class="btn">🗑 Delete</button>
+</div>
+`;
+sDiv.onclick = ()=> toggle(sDiv.nextSibling);
+container.appendChild(sDiv);
 
-        for(let year in data[subject]){
-            let y = document.createElement("div");
-            y.className = "folder";
-            y.innerText = "📁 " + year;
-            y.onclick = ()=> toggle(y.nextSibling);
-            yearDiv.appendChild(y);
+let yearDiv = document.createElement("div");
+yearDiv.className = "sub hidden";
 
-            let unitDiv = document.createElement("div");
-            unitDiv.className = "sub hidden";
+for(let year in data[subject]){
 
-            for(let unit in data[subject][year]){
-                let u = document.createElement("div");
-                u.className = "folder";
-                u.innerText = "📘 " + unit;
-                u.onclick = ()=> toggle(u.nextSibling);
-                unitDiv.appendChild(u);
+let y = document.createElement("div");
+y.className = "folder";
+y.innerHTML = `
+<div class="folder-left">📁 ${year}</div>
+<div class="folder-actions">
+<button class="btn">✏</button>
+<button class="btn">🗑</button>
+</div>
+`;
+y.onclick = ()=> toggle(y.nextSibling);
+yearDiv.appendChild(y);
 
-                let files = document.createElement("div");
-                files.className = "sub hidden";
+let unitDiv = document.createElement("div");
+unitDiv.className = "sub hidden";
 
-                data[subject][year][unit].forEach(file=>{
-                    files.innerHTML += `<div class="file">📄 ${file}</div>`;
-                });
+for(let unit in data[subject][year]){
 
-                unitDiv.appendChild(files);
-            }
+let u = document.createElement("div");
+u.className = "folder";
+u.innerHTML = `
+<div class="folder-left">📘 ${unit}</div>
+<div class="folder-actions">
+<button class="btn">✏</button>
+<button class="btn">🗑</button>
+</div>
+`;
+u.onclick = ()=> toggle(u.nextSibling);
+unitDiv.appendChild(u);
 
-            yearDiv.appendChild(unitDiv);
-        }
+let files = document.createElement("div");
+files.className = "sub hidden";
 
-        container.appendChild(yearDiv);
-    }
+data[subject][year][unit].forEach(file=>{
+files.innerHTML += `
+<div class="file">
+<div class="file-left">📄 ${file}</div>
+<div class="file-actions">
+<button class="btn">👁 View</button>
+<button class="btn">⬇ Download</button>
+<button class="btn">🗑</button>
+</div>
+</div>
+`;
+});
+
+unitDiv.appendChild(files);
+}
+
+yearDiv.appendChild(unitDiv);
+}
+
+container.appendChild(yearDiv);
+}
 }
 
 function toggle(el){
-    el.classList.toggle("hidden");
+el.classList.toggle("hidden");
 }
 
 renderFolders();
